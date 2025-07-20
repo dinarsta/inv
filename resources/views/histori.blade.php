@@ -101,18 +101,29 @@
         <!-- Summary Box -->
         <div class="card mt-4">
             <div class="card-body">
-                <h5 class="card-title">Ringkasan Transaksi</h5>
-                <ul class="list-group">
-                    <li class="list-group-item">✅ Total Barang Masuk: <strong>{{ $totalMasuk }}</strong></li>
-                    <li class="list-group-item">❌ Total Barang Keluar: <strong>{{ $totalKeluar }}</strong></li>
-                    <li class="list-group-item">📦 Sisa Stok Per Barang:
-                        <ul class="mt-2">
-                            @foreach ($stokBarang as $nama => $stok)
-                                <li>{{ $nama }}: <strong>{{ $stok }}</strong> unit</li>
-                            @endforeach
-                        </ul>
-                    </li>
-                </ul>
+                <h5 class="card-title mb-3">📊 Ringkasan Transaksi</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Nama Barang</th>
+                                <th>Sisa Stok (unit)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($stokBarang as $nama => $stok)
+                                <tr>
+                                    <td>{{ $nama }}</td>
+                                    <td><strong>{{ $stok }}</strong></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="2" class="text-center">Belum ada data stok barang.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -122,8 +133,10 @@
         @endphp
         @if($last)
         <div class="alert alert-{{ $last->jenis === 'in' ? 'success' : 'danger' }} alert-custom" role="alert">
-            📢 Barang <strong>{{ $last->barang->nama_barang }}</strong> baru saja
-            <strong>{{ $last->jenis === 'in' ? 'masuk' : 'keluar' }}</strong> sejumlah <strong>{{ $last->jumlah }}</strong> unit!
+            📢 <strong>{{ strtoupper($last->oleh) }}</strong> baru saja
+            <strong>{{ $last->jenis === 'in' ? 'MENAMBAHKAN' : 'MENGELUARKAN' }}</strong>
+            <strong>{{ $last->jumlah }}</strong> unit
+            <strong>{{ $last->barang->nama_barang }}</strong>!
         </div>
         @endif
     </div>

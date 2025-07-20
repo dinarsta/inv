@@ -17,6 +17,7 @@ public function cekBarang($kode_qr)
         return response()->json([
             'exists' => true,
             'nama_barang' => $barang->nama_barang,
+                  'stok' => $barang->stok
         ]);
     } else {
         return response()->json(['exists' => false]);

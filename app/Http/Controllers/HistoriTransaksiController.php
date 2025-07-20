@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -31,6 +33,8 @@ class HistoriTransaksiController extends Controller
 
         $barang = Barang::where('kode_qr', $request->kode_qr)->first();
 
+        $isNew = false;
+
         if (!$barang) {
             if ($request->jenis === 'in') {
                 $barang = Barang::create([
@@ -39,6 +43,7 @@ class HistoriTransaksiController extends Controller
                     'stok' => $request->jumlah,
                     'divisi' => $request->divisi,
                 ]);
+                $isNew = true;
             } else {
                 return back()->with('error', 'Barang tidak ditemukan saat keluar.');
             }
@@ -63,23 +68,30 @@ class HistoriTransaksiController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
-        return redirect()->back()->with('success', 'Transaksi berhasil disimpan.');
+        // Menentukan pesan sukses
+        if ($request->jenis === 'in' && $isNew) {
+            $pesan = "✅ Berhasil menambahkan barang baru *{$barang->nama_barang}* sebanyak {$request->jumlah} unit.";
+        } elseif ($request->jenis === 'in') {
+            $pesan = "✅ Berhasil menambahkan {$request->jumlah} unit ke stok barang *{$barang->nama_barang}*.";
+        } else {
+            $pesan = "✅ Berhasil mengeluarkan {$request->jumlah} unit *{$barang->nama_barang}*.";
+        }
+
+        return redirect()->back()->with('success', $pesan);
     }
 
-public function histori()
-{
-    $histori = \App\Models\HistoriTransaksi::with('barang')->orderByDesc('created_at')->get();
-    return view('histori', compact('histori'));
-}
+    public function histori()
+    {
+        $histori = HistoriTransaksi::with('barang')->orderByDesc('created_at')->get();
+        return view('histori', compact('histori'));
+    }
 
-public function dashboard()
-{
-    $totalMasuk = HistoriTransaksi::where('jenis', 'in')->sum('jumlah');
-    $totalKeluar = HistoriTransaksi::where('jenis', 'out')->sum('jumlah');
-    $totalBarang = Barang::count();
+    public function dashboard()
+    {
+        $totalMasuk = HistoriTransaksi::where('jenis', 'in')->sum('jumlah');
+        $totalKeluar = HistoriTransaksi::where('jenis', 'out')->sum('jumlah');
+        $totalBarang = Barang::count();
 
-
-    return view('dashboard', compact('totalMasuk', 'totalKeluar', 'totalBarang'));
-}
-
+        return view('dashboard', compact('totalMasuk', 'totalKeluar', 'totalBarang'));
+    }
 }

@@ -54,6 +54,12 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="stok_barang" class="form-label">Stok Barang</label>
+                    <input type="text" name="stok_barang" id="stok_barang" class="form-control" readonly>
+                    <small id="peringatan-stok" class="text-danger fw-bold" style="display: none;">⚠️ Barang hampir habis!</small>
+                </div>
+
+                <div class="mb-3">
                     <label for="jumlah" class="form-label">Jumlah Keluar</label>
                     <input type="number" name="jumlah" class="form-control" required min="1">
                 </div>
@@ -89,9 +95,19 @@
             .then(data => {
                 if (data.exists) {
                     document.getElementById('nama_barang').value = data.nama_barang;
+                    document.getElementById('stok_barang').value = data.stok;
+
+                    if (parseInt(data.stok) <= 3) {
+                        document.getElementById('peringatan-stok').style.display = 'block';
+                    } else {
+                        document.getElementById('peringatan-stok').style.display = 'none';
+                    }
+
                     document.getElementById('form-lanjutan').style.display = 'block';
                 } else {
                     document.getElementById('nama_barang').value = 'Barang tidak ditemukan';
+                    document.getElementById('stok_barang').value = '';
+                    document.getElementById('peringatan-stok').style.display = 'none';
                     document.getElementById('form-lanjutan').style.display = 'none';
                     alert('⚠️ Barang tidak ditemukan. Pastikan kode benar.');
                 }

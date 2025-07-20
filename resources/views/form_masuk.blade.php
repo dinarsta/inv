@@ -26,6 +26,7 @@
     </style>
 </head>
 <body class="bg-light">
+
 <div class="container">
     <div class="form-wrapper">
         <a href="/" class="btn btn-sm btn-outline-secondary btn-back">← Kembali</a>
@@ -49,11 +50,11 @@
                 <input type="text" name="kode_qr" id="kode_qr" class="form-control" required onblur="cekBarang()">
             </div>
 
-            {{-- Form lainnya hanya muncul jika data ditemukan --}}
+            {{-- Form lengkap --}}
             <div id="form-lengkap">
                 <div class="mb-3">
                     <label for="nama_barang" class="form-label">Nama Barang</label>
-                    <input type="text" name="nama_barang" id="nama_barang" class="form-control" readonly>
+                    <input type="text" name="nama_barang" id="nama_barang" class="form-control">
                 </div>
 
                 <div class="mb-3">
@@ -82,6 +83,23 @@
     </div>
 </div>
 
+
+<!-- Modal Barang Tidak Terdaftar -->
+<div class="modal fade" id="barangModal" tabindex="-1" aria-labelledby="barangModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-body py-5">
+        <div class="text-danger fs-1 mb-3">❗</div>
+        <h5 class="modal-title fw-bold text-uppercase" id="barangModalLabel">Barang Belum Terdaftar</h5>
+        <p class="mt-2 mb-4">Silakan isi data barang terlebih dahulu..</p>
+        <button type="button" class="btn btn-danger px-4" id="modal-oke" data-bs-dismiss="modal">OKE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function cekBarang() {
         const kodeQR = document.getElementById('kode_qr').value.trim();
@@ -91,23 +109,32 @@
         fetch(`/barang/cek/${kodeQR}`)
             .then(response => response.json())
             .then(data => {
-                const formLengkap = document.getElementById('form-lengkap');
                 const namaInput = document.getElementById('nama_barang');
+                const formLengkap = document.getElementById('form-lengkap');
 
                 if (data.exists) {
                     namaInput.value = data.nama_barang;
                     namaInput.readOnly = true;
                     formLengkap.style.display = 'block';
                 } else {
-                    formLengkap.style.display = 'none';
                     namaInput.value = '';
-                    alert('❗ Barang tidak ditemukan. Silakan daftar barang terlebih dahulu.');
+                    namaInput.readOnly = false;
+
+                    // Tampilkan modal, form hanya muncul setelah klik OK
+                    const modal = new bootstrap.Modal(document.getElementById('barangModal'));
+                    modal.show();
+
+                    // Tampilkan form setelah klik OKE
+                    document.getElementById('modal-oke').onclick = function () {
+                        formLengkap.style.display = 'block';
+                    };
                 }
             })
             .catch(error => {
-                console.error('Error saat cek barang:', error);
+                console.error('Gagal cek barang:', error);
             });
     }
 </script>
+
 </body>
 </html>
