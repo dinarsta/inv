@@ -6,10 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Barang;
 use App\Models\HistoriTransaksi;
 use App\Exports\HistoriExport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\HistoriImport;
-use Illuminate\Support\Facades\Validator;
-
+use Maatwebsite\Excel\Facades\Excel;
 
 class HistoriTransaksiController extends Controller
 {
@@ -70,13 +68,13 @@ class HistoriTransaksiController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
-        // Pesan sukses
+        // Buat pesan sukses
         if ($request->jenis === 'in' && $isNew) {
-            $pesan = "✅ Berhasil menambahkan barang baru *{$barang->nama_barang}* sebanyak {$request->jumlah} unit.";
+            $pesan = "✅ Barang baru *{$barang->nama_barang}* ditambahkan sebanyak {$request->jumlah} unit.";
         } elseif ($request->jenis === 'in') {
-            $pesan = "✅ Berhasil menambahkan {$request->jumlah} unit ke stok barang *{$barang->nama_barang}*.";
+            $pesan = "✅ Stok *{$barang->nama_barang}* ditambah sebanyak {$request->jumlah} unit.";
         } else {
-            $pesan = "✅ Berhasil mengeluarkan {$request->jumlah} unit *{$barang->nama_barang}*.";
+            $pesan = "✅ Barang *{$barang->nama_barang}* dikeluarkan sebanyak {$request->jumlah} unit.";
         }
 
         return redirect()->back()->with('success', $pesan);
@@ -97,23 +95,22 @@ class HistoriTransaksiController extends Controller
         return view('dashboard', compact('totalMasuk', 'totalKeluar', 'totalBarang'));
     }
 
-public function export()
-{
-    $tanggal = now()->format('d-m-Y'); // Format: 29-07-2025
-    $fileName = 'histori_transaksi_' . $tanggal . '.xlsx';
+    public function export()
+    {
+        $tanggal = now()->format('d-m-Y');
+        $fileName = 'histori_transaksi_' . $tanggal . '.xlsx';
 
-    return Excel::download(new HistoriExport, $fileName);
-}
+        return Excel::download(new HistoriExport, $fileName);
+    }
 
-public function import(Request $request)
-{
-    $request->validate([
-        'file' => 'required|file|mimes:xlsx,xls'
-    ]);
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls',
+        ]);
 
-    Excel::import(new HistoriImport, $request->file('file'));
+        Excel::import(new HistoriImport, $request->file('file'));
 
-    return redirect()->back()->with('success', '📥 Data histori berhasil diimport!');
-}
-
+        return redirect()->back()->with('success', '📥 Data histori berhasil diimport!');
+    }
 }

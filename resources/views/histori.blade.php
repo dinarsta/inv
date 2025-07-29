@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Histori Transaksi Barang</title>
+  <title>Monitoring Histori Transaksi | PRIMANUSA</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     header, footer {
@@ -54,7 +54,7 @@
 <!-- Header -->
 <header class="bg-white shadow-sm">
   <div class="container d-flex justify-content-between align-items-center flex-wrap header-flex py-3">
-    <h3 class="mb-0">📑 Histori Transaksi Barang</h3>
+    <h3 class="mb-0">📑 Monitoring Histori Transaksi</h3>
     <div class="d-flex flex-wrap gap-2">
       <a href="/" class="btn btn-outline-primary">🏠 Home</a>
       <a href="/in" class="btn btn-outline-success">➕ Barang Masuk</a>
@@ -84,6 +84,7 @@
 
   <!-- Tabel Histori Transaksi -->
   <div class="table-responsive bg-white p-3 border rounded shadow-sm">
+    <h5 class="mb-3">📋 Data Transaksi Barang</h5>
     <table class="table table-bordered table-striped table-hover">
       <thead class="table-dark">
         <tr>
@@ -145,7 +146,7 @@
   <!-- Ringkasan -->
   <div class="card mt-4 shadow-sm">
     <div class="card-body">
-      <h5 class="card-title mb-3">📊 Ringkasan Transaksi</h5>
+      <h5 class="card-title mb-3">📊 Ringkasan Stok per Barang</h5>
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
           <thead class="table-secondary">
