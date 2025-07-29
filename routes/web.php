@@ -20,3 +20,7 @@ Route::get('/barang/cek/{kode_qr}', [BarangController::class, 'cekBarang']);
 Route::get('/histori', [HistoriTransaksiController::class, 'histori'])->name('histori.histori');
 
 Route::get('/', [HistoriTransaksiController::class, 'dashboard'])->name('dashboard');
+
+Route::get('/histori/export', [HistoriTransaksiController::class, 'export'])->name('histori.export');
+
+Route::post('/histori/import', [HistoriTransaksiController::class, 'import'])->name('histori.import');

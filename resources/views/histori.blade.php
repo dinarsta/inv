@@ -52,13 +52,14 @@
 <body class="bg-light">
 
 <!-- Header -->
-<header>
-  <div class="container d-flex justify-content-between align-items-center flex-wrap header-flex">
+<header class="bg-white shadow-sm">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap header-flex py-3">
     <h3 class="mb-0">📑 Histori Transaksi Barang</h3>
     <div class="d-flex flex-wrap gap-2">
       <a href="/" class="btn btn-outline-primary">🏠 Home</a>
       <a href="/in" class="btn btn-outline-success">➕ Barang Masuk</a>
       <a href="/out" class="btn btn-outline-danger">➖ Barang Keluar</a>
+      <a href="{{ route('histori.export') }}" class="btn btn-success">📥 Export Excel</a>
     </div>
   </div>
 </header>
@@ -66,8 +67,23 @@
 <!-- Main Content -->
 <div class="container mt-4 mb-5">
 
-  <!-- Table -->
-  <div class="table-responsive">
+  <!-- Import Excel -->
+  <div class="bg-white border rounded p-3 shadow-sm mb-4">
+    <form action="{{ route('histori.import') }}" method="POST" enctype="multipart/form-data" class="row g-3 align-items-center">
+      @csrf
+      <div class="col-md-6 col-sm-12">
+        <input type="file" name="file" class="form-control" required>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-warning">
+          📤 Import Excel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabel Histori Transaksi -->
+  <div class="table-responsive bg-white p-3 border rounded shadow-sm">
     <table class="table table-bordered table-striped table-hover">
       <thead class="table-dark">
         <tr>
@@ -126,8 +142,8 @@
     </table>
   </div>
 
-  <!-- Summary Box -->
-  <div class="card mt-4">
+  <!-- Ringkasan -->
+  <div class="card mt-4 shadow-sm">
     <div class="card-body">
       <h5 class="card-title mb-3">📊 Ringkasan Transaksi</h5>
       <div class="table-responsive">
@@ -156,9 +172,7 @@
   </div>
 
   <!-- Alert Transaksi Terakhir -->
-  @php
-    $last = $histori->first();
-  @endphp
+  @php $last = $histori->first(); @endphp
   @if($last)
     <div class="alert alert-{{ $last->jenis === 'in' ? 'success' : 'danger' }} alert-custom" role="alert">
       📢 <strong>{{ strtoupper($last->oleh) }}</strong> baru saja
@@ -167,10 +181,11 @@
       <strong>{{ $last->barang->nama_barang }}</strong>!
     </div>
   @endif
+
 </div>
 
 <!-- Footer -->
-<footer>
+<footer class="mt-5">
   <div class="container text-center">
     <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA</small>
   </div>

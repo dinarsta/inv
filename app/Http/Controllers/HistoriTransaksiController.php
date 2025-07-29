@@ -1,12 +1,15 @@
 <?php
 
-
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Barang;
 use App\Models\HistoriTransaksi;
+use App\Exports\HistoriExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\HistoriImport;
+use Illuminate\Support\Facades\Validator;
+
 
 class HistoriTransaksiController extends Controller
 {
@@ -32,7 +35,6 @@ class HistoriTransaksiController extends Controller
         ]);
 
         $barang = Barang::where('kode_qr', $request->kode_qr)->first();
-
         $isNew = false;
 
         if (!$barang) {
@@ -68,7 +70,7 @@ class HistoriTransaksiController extends Controller
             'keterangan' => $request->keterangan,
         ]);
 
-        // Menentukan pesan sukses
+        // Pesan sukses
         if ($request->jenis === 'in' && $isNew) {
             $pesan = "✅ Berhasil menambahkan barang baru *{$barang->nama_barang}* sebanyak {$request->jumlah} unit.";
         } elseif ($request->jenis === 'in') {
@@ -94,4 +96,24 @@ class HistoriTransaksiController extends Controller
 
         return view('dashboard', compact('totalMasuk', 'totalKeluar', 'totalBarang'));
     }
+
+public function export()
+{
+    $tanggal = now()->format('d-m-Y'); // Format: 29-07-2025
+    $fileName = 'histori_transaksi_' . $tanggal . '.xlsx';
+
+    return Excel::download(new HistoriExport, $fileName);
+}
+
+public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:xlsx,xls'
+    ]);
+
+    Excel::import(new HistoriImport, $request->file('file'));
+
+    return redirect()->back()->with('success', '📥 Data histori berhasil diimport!');
+}
+
 }
