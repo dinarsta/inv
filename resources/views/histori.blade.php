@@ -52,18 +52,49 @@
 <body class="bg-light">
 
 <!-- Header -->
-<header class="bg-white shadow-sm">
-  <div class="container d-flex justify-content-between align-items-center flex-wrap header-flex py-3">
-    <h3 class="mb-0">📑 Monitoring Histori Transaksi</h3>
-    <div class="d-flex flex-wrap gap-2">
-      <a href="/" class="btn btn-outline-primary">🏠 Home</a>
-      <a href="/in" class="btn btn-outline-success">➕ Barang Masuk</a>
-      <a href="/out" class="btn btn-outline-danger">➖ Barang Keluar</a>
-      <a href="{{ route('histori.export') }}" class="btn btn-success">📥 Export Excel</a>
+<header class="bg-white shadow-sm py-3">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <!-- Title Section -->
+    <h3 class="mb-0 fw-bold d-flex align-items-center gap-2">
+      <span>📑</span> Monitoring Histori Transaksi
+    </h3>
+
+    <!-- Navigation and Form Section -->
+    <div class="d-flex flex-wrap align-items-center gap-3">
+      <!-- Navigation Buttons -->
+      <div class="d-flex flex-wrap gap-2">
+        <a href="/" class="btn btn-outline-primary d-flex align-items-center gap-2">
+          <span>🏠</span> Home
+        </a>
+        <a href="/in" class="btn btn-outline-success d-flex align-items-center gap-2">
+          <span>➕</span> Barang Masuk
+        </a>
+        <a href="/out" class="btn btn-outline-danger d-flex align-items-center gap-2">
+          <span>➖</span> Barang Keluar
+        </a>
+      </div>
+
+      <!-- Export by Date Form -->
+      <div class="bg-white border rounded p-3 shadow-sm">
+        <form action="{{ route('histori.exportByDate') }}" method="GET" class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label for="start_date" class="form-label fw-medium">Dari Tanggal</label>
+            <input type="date" name="start_date" id="start_date" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label for="end_date" class="form-label fw-medium">Sampai Tanggal</label>
+            <input type="date" name="end_date" id="end_date" class="form-control" required>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-outline-success d-flex align-items-center gap-2">
+              <span>📤</span> Export Sesuai Tanggal
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </header>
-
 <!-- Main Content -->
 <div class="container mt-4 mb-5">
 
@@ -88,7 +119,7 @@
     <table class="table table-bordered table-striped table-hover">
       <thead class="table-dark">
         <tr>
-          <th>#</th>
+          <th>NO</th>
           <th>QR / Barcode</th>
           <th>Nama Barang</th>
           <th>Jenis</th>

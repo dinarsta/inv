@@ -19,6 +19,26 @@
       min-width: 150px;
     }
 
+    .suggestion-box {
+      position: absolute;
+      z-index: 999;
+      background: white;
+      width: 100%;
+      border: 1px solid #ced4da;
+      border-top: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .suggestion-item {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .suggestion-item:hover {
+      background-color: #f1f1f1;
+    }
+
     @media (max-width: 576px) {
       .btn-custom {
         width: 100%;
@@ -41,7 +61,7 @@
     </div>
   </div>
 
-  <div class="card p-4 bg-white form-wrapper">
+  <div class="card p-4 bg-white form-wrapper position-relative">
     @if (session('success'))
       <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -53,9 +73,10 @@
       @csrf
       <input type="hidden" name="jenis" value="in">
 
-      <div class="mb-3">
+      <div class="mb-3 position-relative">
         <label for="kode_qr" class="form-label">Scan Kode QR / Barcode</label>
         <input type="text" name="kode_qr" id="kode_qr" class="form-control" required autocomplete="off">
+        <div id="suggestions" class="suggestion-box d-none"></div>
       </div>
 
       <div id="form-lengkap">
@@ -106,16 +127,54 @@
 
 <!-- Footer -->
 <footer class="footer text-center text-muted py-4 mt-5">
-    <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA
+  <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA</small>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  const kodeInput = document.getElementById('kode_qr');
+  const suggestionsBox = document.getElementById('suggestions');
+
   let timeout = null;
 
-  document.getElementById('kode_qr').addEventListener('input', function () {
+  kodeInput.addEventListener('input', function () {
+    const query = this.value.trim();
     clearTimeout(timeout);
-    timeout = setTimeout(cekBarang, 300);
+
+    if (query.length < 2) {
+      suggestionsBox.classList.add('d-none');
+      return;
+    }
+
+    timeout = setTimeout(() => {
+      fetch(`/barang/suggest?q=${query}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.length > 0) {
+            suggestionsBox.innerHTML = '';
+            data.forEach(item => {
+              const div = document.createElement('div');
+              div.className = 'suggestion-item';
+              div.textContent = item.kode_qr;
+              div.onclick = () => {
+                kodeInput.value = item.kode_qr;
+                suggestionsBox.classList.add('d-none');
+                cekBarang(); // Trigger pengecekan
+              };
+              suggestionsBox.appendChild(div);
+            });
+            suggestionsBox.classList.remove('d-none');
+          } else {
+            suggestionsBox.classList.add('d-none');
+          }
+        });
+    }, 300);
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!suggestionsBox.contains(e.target) && e.target !== kodeInput) {
+      suggestionsBox.classList.add('d-none');
+    }
   });
 
   function cekBarang() {

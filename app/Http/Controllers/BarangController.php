@@ -30,6 +30,19 @@ public function cekBarang($kode_qr)
     public function index()
     {
         $barangs = Barang::orderBy('nama_barang')->get();
+
         return view('barang.index', compact('barangs'));
     }
+
+    public function suggest(Request $request)
+{
+    $q = $request->query('q');
+    $data = \App\Models\Barang::where('kode_qr', 'like', "%$q%")
+        ->select('kode_qr')
+        ->limit(10)
+        ->get();
+
+    return response()->json($data);
+}
+
 }

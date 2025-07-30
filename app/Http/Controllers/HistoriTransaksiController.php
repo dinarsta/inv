@@ -8,6 +8,7 @@ use App\Models\HistoriTransaksi;
 use App\Exports\HistoriExport;
 use App\Imports\HistoriImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\HistoriExportByDate;
 
 class HistoriTransaksiController extends Controller
 {
@@ -113,4 +114,14 @@ class HistoriTransaksiController extends Controller
 
         return redirect()->back()->with('success', '📥 Data histori berhasil diimport!');
     }
+
+    public function exportByDate(Request $request)
+{
+    $request->validate([
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+    ]);
+
+    return Excel::download(new HistoriExportByDate($request->start_date, $request->end_date), 'histori_' . $request->start_date . '_to_' . $request->end_date . '.xlsx');
+}
 }
