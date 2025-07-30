@@ -6,19 +6,9 @@
   <title>Form Barang Masuk</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    .card {
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .btn-custom {
-      min-width: 150px;
-    }
-
+    body { font-family: 'Segoe UI', sans-serif; }
+    .card { border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .btn-custom { min-width: 150px; }
     .suggestion-box {
       position: absolute;
       z-index: 999;
@@ -29,24 +19,11 @@
       max-height: 200px;
       overflow-y: auto;
     }
-
-    .suggestion-item {
-      padding: 10px;
-      cursor: pointer;
-    }
-
-    .suggestion-item:hover {
-      background-color: #f1f1f1;
-    }
-
+    .suggestion-item { padding: 10px; cursor: pointer; }
+    .suggestion-item:hover { background-color: #f1f1f1; }
     @media (max-width: 576px) {
-      .btn-custom {
-        width: 100%;
-      }
-
-      .form-wrapper {
-        padding: 1rem;
-      }
+      .btn-custom { width: 100%; }
+      .form-wrapper { padding: 1rem; }
     }
   </style>
 </head>
@@ -62,13 +39,6 @@
   </div>
 
   <div class="card p-4 bg-white form-wrapper position-relative">
-    @if (session('success'))
-      <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-      <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
     <form method="POST" action="{{ route('transaksi.store') }}">
       @csrf
       <input type="hidden" name="jenis" value="in">
@@ -76,6 +46,8 @@
       <div class="mb-3 position-relative">
         <label for="kode_qr" class="form-label">Scan Kode QR / Barcode</label>
         <input type="text" name="kode_qr" id="kode_qr" class="form-control" required autocomplete="off">
+        <button type="button" id="scan-btn" class="btn btn-outline-secondary w-100 d-sm-none mt-2">📷 Scan Barcode</button>
+        <div id="qr-reader" style="display: none;" class="my-3"></div>
         <div id="suggestions" class="suggestion-box d-none"></div>
       </div>
 
@@ -125,12 +97,12 @@
   </div>
 </div>
 
-<!-- Footer -->
 <footer class="footer text-center text-muted py-4 mt-5">
   <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA</small>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
   const kodeInput = document.getElementById('kode_qr');
   const suggestionsBox = document.getElementById('suggestions');
@@ -159,7 +131,7 @@
               div.onclick = () => {
                 kodeInput.value = item.kode_qr;
                 suggestionsBox.classList.add('d-none');
-                cekBarang(); // Trigger pengecekan
+                cekBarang();
               };
               suggestionsBox.appendChild(div);
             });
@@ -178,7 +150,7 @@
   });
 
   function cekBarang() {
-    const kodeQR = document.getElementById('kode_qr').value.trim();
+    const kodeQR = kodeInput.value.trim();
     if (kodeQR === '') return;
 
     fetch(`/barang/cek/${kodeQR}`)
@@ -207,6 +179,45 @@
         console.error('Gagal cek barang:', err);
       });
   }
+
+
+  // QR SCAN BUTTON
+  const scanBtn = document.getElementById('scan-btn');
+  const qrReader = document.getElementById('qr-reader');
+  let html5QrCode;
+
+  scanBtn.addEventListener('click', () => {
+    if (!Html5Qrcode.getCameras) {
+      alert("Browser tidak mendukung kamera.");
+      return;
+    }
+
+    if (!html5QrCode) {
+      html5QrCode = new Html5Qrcode("qr-reader");
+    }
+
+    qrReader.style.display = 'block';
+
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        let backCamera = devices.find(device => device.label.toLowerCase().includes('back')) || devices[devices.length - 1];
+        const cameraId = backCamera.id;
+
+        html5QrCode.start(
+          cameraId,
+          { fps: 10, qrbox: 250 },
+          qrCodeMessage => {
+            kodeInput.value = qrCodeMessage;
+            html5QrCode.stop().then(() => {
+              qrReader.style.display = 'none';
+              cekBarang();
+            }).catch(err => console.error("Stop error", err));
+          },
+          error => {} // silent
+        ).catch(err => console.error("Start error", err));
+      }
+    }).catch(err => console.error("Camera error", err));
+  });
 </script>
 
 </body>
