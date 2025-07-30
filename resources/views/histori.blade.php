@@ -54,27 +54,13 @@
 <!-- Header -->
 <header class="bg-white shadow-sm py-3">
   <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
-    <!-- Title Section -->
-    <h3 class="mb-0 fw-bold d-flex align-items-center gap-2">
-      <span>📑</span> Monitoring Histori Transaksi
-    </h3>
-
-    <!-- Navigation and Form Section -->
+    <h3 class="mb-0 fw-bold d-flex align-items-center gap-2">📑 Monitoring Histori Transaksi</h3>
     <div class="d-flex flex-wrap align-items-center gap-3">
-      <!-- Navigation Buttons -->
       <div class="d-flex flex-wrap gap-2">
-        <a href="/" class="btn btn-outline-primary d-flex align-items-center gap-2">
-          <span>🏠</span> Home
-        </a>
-        <a href="/in" class="btn btn-outline-success d-flex align-items-center gap-2">
-          <span>➕</span> Barang Masuk
-        </a>
-        <a href="/out" class="btn btn-outline-danger d-flex align-items-center gap-2">
-          <span>➖</span> Barang Keluar
-        </a>
+        <a href="/" class="btn btn-outline-primary">🏠 Home</a>
+        <a href="/in" class="btn btn-outline-success">➕ Barang Masuk</a>
+        <a href="/out" class="btn btn-outline-danger">➖ Barang Keluar</a>
       </div>
-
-      <!-- Export by Date Form -->
       <div class="bg-white border rounded p-3 shadow-sm">
         <form action="{{ route('histori.exportByDate') }}" method="GET" class="row g-3 align-items-end">
           <div class="col-md-4">
@@ -86,16 +72,14 @@
             <input type="date" name="end_date" id="end_date" class="form-control" required>
           </div>
           <div class="col-auto">
-            <button type="submit" class="btn btn-outline-success d-flex align-items-center gap-2">
-              <span>📤</span> Export Sesuai Tanggal
-            </button>
+            <button type="submit" class="btn btn-outline-success">📤 Export</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 </header>
-<!-- Main Content -->
+
 <div class="container mt-4 mb-5">
 
   <!-- Import Excel -->
@@ -106,96 +90,104 @@
         <input type="file" name="file" class="form-control" required>
       </div>
       <div class="col-auto">
-        <button type="submit" class="btn btn-warning">
-          📤 Import Excel
-        </button>
+        <button type="submit" class="btn btn-warning">📤 Import Excel</button>
       </div>
     </form>
   </div>
 
-  <!-- Tabel Histori Transaksi -->
-  <div class="table-responsive bg-white p-3 border rounded shadow-sm">
-    <h5 class="mb-3">📋 Data Transaksi Barang</h5>
-    <table class="table table-bordered table-striped table-hover">
-      <thead class="table-dark">
-        <tr>
-          <th>NO</th>
-          <th>QR / Barcode</th>
-          <th>Nama Barang</th>
-          <th>Jenis</th>
-          <th>Jumlah</th>
-          <th>Oleh</th>
-          <th>Divisi</th>
-          <th>Keterangan</th>
-          <th>Waktu</th>
-        </tr>
-      </thead>
-      <tbody>
-        @php
-            $totalMasuk = 0;
-            $totalKeluar = 0;
-            $stokBarang = [];
-        @endphp
-        @forelse($histori as $index => $item)
-          @php
-              if ($item->jenis === 'in') {
-                  $totalMasuk += $item->jumlah;
-              } else {
-                  $totalKeluar += $item->jumlah;
-              }
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3" id="dataTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="histori-tab" data-bs-toggle="tab" data-bs-target="#histori" type="button" role="tab">Histori Transaksi</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="stok-tab" data-bs-toggle="tab" data-bs-target="#stok" type="button" role="tab">Ringkasan Stok</button>
+    </li>
+  </ul>
 
-              $namaBarang = $item->barang->nama_barang;
-              if (!isset($stokBarang[$namaBarang])) {
-                  $stokBarang[$namaBarang] = 0;
-              }
-              $stokBarang[$namaBarang] += $item->jenis === 'in' ? $item->jumlah : -$item->jumlah;
-          @endphp
-          <tr>
-            <td>{{ $index + 1 }}</td>
-            <td>{{ $item->barang->kode_qr }}</td>
-            <td>{{ $item->barang->nama_barang }}</td>
-            <td>
-              <span class="badge bg-{{ $item->jenis === 'in' ? 'success' : 'danger' }}">
-                {{ $item->jenis === 'in' ? 'Masuk' : 'Keluar' }}
-              </span>
-            </td>
-            <td>{{ $item->jumlah }}</td>
-            <td>{{ $item->oleh }}</td>
-            <td>{{ $item->divisi ?? '-' }}</td>
-            <td>{{ $item->keterangan ?? '-' }}</td>
-            <td>{{ $item->created_at->format('d-m-Y H:i') }}</td>
-          </tr>
-        @empty
-          <tr>
-            <td colspan="9" class="text-center">Belum ada histori transaksi.</td>
-          </tr>
-        @endforelse
-      </tbody>
-    </table>
-  </div>
+  <div class="tab-content" id="dataTabContent">
+    <!-- Tab Histori -->
+    <div class="tab-pane fade show active" id="histori" role="tabpanel">
+      <div class="table-responsive bg-white p-3 border rounded shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <h5 class="mb-0">📋 Data Transaksi Barang</h5>
+          <input type="text" id="searchInput" class="form-control w-auto" placeholder="🔍 Cari...">
+        </div>
+        <table class="table table-bordered table-striped table-hover" id="historiTable">
+          <thead class="table-dark">
+            <tr>
+              <th>NO</th>
+              <th>QR / Barcode</th>
+              <th>Nama Barang</th>
+              <th>Jenis</th>
+              <th>Jumlah</th>
+              <th>Oleh</th>
+              <th>Divisi</th>
+              <th>Keterangan</th>
+              <th>Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="historiBody">
+            @php
+              $totalMasuk = 0;
+              $totalKeluar = 0;
+              $stokBarang = [];
+            @endphp
+            @forelse($histori as $index => $item)
+              @php
+                  if ($item->jenis === 'in') {
+                      $totalMasuk += $item->jumlah;
+                  } else {
+                      $totalKeluar += $item->jumlah;
+                  }
+                  $namaBarang = $item->barang->nama_barang;
+                  if (!isset($stokBarang[$namaBarang])) {
+                      $stokBarang[$namaBarang] = 0;
+                  }
+                  $stokBarang[$namaBarang] += $item->jenis === 'in' ? $item->jumlah : -$item->jumlah;
+              @endphp
+              <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item->barang->kode_qr }}</td>
+                <td>{{ $item->barang->nama_barang }}</td>
+                <td><span class="badge bg-{{ $item->jenis === 'in' ? 'success' : 'danger' }}">{{ $item->jenis === 'in' ? 'Masuk' : 'Keluar' }}</span></td>
+                <td>{{ $item->jumlah }}</td>
+                <td>{{ $item->oleh }}</td>
+                <td>{{ $item->divisi ?? '-' }}</td>
+                <td>{{ $item->keterangan ?? '-' }}</td>
+                <td>{{ $item->created_at->format('d-m-Y H:i') }}</td>
+              </tr>
+            @empty
+              <tr><td colspan="9" class="text-center">Belum ada histori transaksi.</td></tr>
+            @endforelse
+          </tbody>
+        </table>
+        <div id="pagination" class="d-flex justify-content-center mt-3"></div>
+      </div>
+    </div>
 
-  <!-- Ringkasan -->
-  <div class="card mt-4 shadow-sm">
-    <div class="card-body">
-      <h5 class="card-title mb-3">📊 Ringkasan Stok per Barang</h5>
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped">
+    <!-- Tab Stok -->
+    <div class="tab-pane fade" id="stok" role="tabpanel">
+      <div class="table-responsive bg-white p-3 border rounded shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <h5 class="mb-0">📊 Ringkasan Stok per Barang</h5>
+          <input type="text" id="searchStokInput" class="form-control w-auto" placeholder="🔍 Cari Nama Barang...">
+        </div>
+        <table class="table table-bordered table-striped" id="stokTable">
           <thead class="table-secondary">
             <tr>
               <th>Nama Barang</th>
               <th>Sisa Stok (unit)</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="stokBody">
             @forelse ($stokBarang as $nama => $stok)
               <tr>
                 <td>{{ $nama }}</td>
                 <td><strong>{{ $stok }}</strong></td>
               </tr>
             @empty
-              <tr>
-                <td colspan="2" class="text-center">Belum ada data stok barang.</td>
-              </tr>
+              <tr><td colspan="2" class="text-center">Belum ada data stok barang.</td></tr>
             @endforelse
           </tbody>
         </table>
@@ -203,7 +195,7 @@
     </div>
   </div>
 
-  <!-- Alert Transaksi Terakhir -->
+  <!-- Alert -->
   @php $last = $histori->first(); @endphp
   @if($last)
     <div class="alert alert-{{ $last->jenis === 'in' ? 'success' : 'danger' }} alert-custom" role="alert">
@@ -223,5 +215,61 @@
   </div>
 </footer>
 
+<!-- JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Histori Table Pagination + Search
+    const rowsPerPage = 10;
+    const tbody = document.getElementById('historiBody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const pagination = document.getElementById('pagination');
+    const searchInput = document.getElementById('searchInput');
+    let currentPage = 1;
+
+    function renderTable(filtered = rows) {
+      const start = (currentPage - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      tbody.innerHTML = '';
+      filtered.slice(start, end).forEach(row => tbody.appendChild(row));
+      renderPagination(filtered);
+    }
+
+    function renderPagination(filtered) {
+      const totalPages = Math.ceil(filtered.length / rowsPerPage);
+      pagination.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-sm btn-outline-primary mx-1';
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add('active');
+        btn.onclick = () => { currentPage = i; renderTable(filtered); };
+        pagination.appendChild(btn);
+      }
+    }
+
+    searchInput.addEventListener('input', () => {
+      const keyword = searchInput.value.toLowerCase();
+      const filtered = rows.filter(row => row.textContent.toLowerCase().includes(keyword));
+      currentPage = 1;
+      renderTable(filtered);
+    });
+
+    renderTable();
+
+    // Ringkasan Stok Search
+    const stokInput = document.getElementById('searchStokInput');
+    const stokBody = document.getElementById('stokBody');
+    const stokRows = Array.from(stokBody.querySelectorAll('tr'));
+
+    stokInput.addEventListener('input', () => {
+      const keyword = stokInput.value.toLowerCase();
+      stokRows.forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(keyword) ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
