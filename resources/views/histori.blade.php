@@ -192,6 +192,11 @@
                         <input type="text" id="searchStokInput" class="form-control w-auto"
                             placeholder="🔍 Cari Nama Barang...">
                     </div>
+                    <div class="mb-4">
+                        <button id="exportStokExcel" class="btn btn-success">
+                            📁 Export Excel
+                        </button>
+                    </div>
                     <table class="table table-bordered table-striped table-hover" id="stokTable">
                         <thead class="table-secondary">
                             <tr>
@@ -221,6 +226,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Alert -->
             @php $last = $histori->first(); @endphp
             @if($last)
@@ -337,9 +343,36 @@
                     showPage(1);
                 }
             });
+            // export stok
+
+    document.getElementById('exportStokExcel').addEventListener('click', function () {
+        // Sembunyikan pagination dan tampilkan semua baris sebelum export
+        const pagination = document.getElementById('paginationStok');
+        const rows = document.querySelectorAll('#stokBody tr');
+
+        // Simpan tampilan awal
+        const displayStyles = [];
+        rows.forEach((row, index) => {
+            displayStyles[index] = row.style.display;
+            row.style.display = ''; // Tampilkan semua
+        });
+
+        // Export
+        let table = document.getElementById('stokTable');
+        let wb = XLSX.utils.table_to_book(table, { sheet: "Stok Barang" });
+        XLSX.writeFile(wb, 'stok_barang.xlsx');
+
+        // Kembalikan tampilan awal
+        rows.forEach((row, index) => {
+            row.style.display = displayStyles[index];
+        });
+    });
+
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 </body>
 
 </html>
