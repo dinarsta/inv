@@ -25,17 +25,21 @@ class HistoriImport implements ToCollection
             $divisi     = $row[5];
             $keterangan = $row[6];
 
-            // Cek dan ubah format tanggal
-            $waktu = null;
-            if (is_numeric($row[7])) {
-                $waktu = Carbon::instance(Date::excelToDateTimeObject($row[7]));
-            } else {
-                try {
-                    $waktu = Carbon::parse($row[7]);
-                } catch (\Exception $e) {
-                    $waktu = now(); // fallback kalau format tidak valid
-                }
-            }
+       // Cek dan ubah format tanggal dari Excel
+$waktu = null;
+
+if (is_numeric($row[7])) {
+    // Format Excel (serial number)
+    $waktu = Carbon::instance(Date::excelToDateTimeObject($row[7]));
+} else {
+    // Format teks (ex: 2025-08-01 14:30:00)
+    try {
+        $waktu = Carbon::parse($row[7]);
+    } catch (\Exception $e) {
+        // Lewati baris jika format tidak valid
+        continue;
+    }
+}
 
             // Cek apakah barang sudah ada
             $barang = Barang::where('kode_qr', $kodeQr)->first();

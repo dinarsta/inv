@@ -66,6 +66,7 @@ class HistoriTransaksiController extends Controller
             'jumlah' => $request->jumlah,
             'oleh' => $request->oleh,
             'divisi' => $request->divisi,
+            'created_at' => $request->created_at,
             'keterangan' => $request->keterangan,
         ]);
 
@@ -146,18 +147,26 @@ public function histori()
 public function update(Request $request, $id)
 {
     $request->validate([
-        'jumlah' => 'required|integer|min:1',
+        'jumlah' => 'required|numeric',
         'jenis' => 'required|in:in,out',
         'oleh' => 'required|string',
         'divisi' => 'nullable|string',
         'keterangan' => 'nullable|string',
+        'created_at' => 'required|date',
     ]);
 
     $histori = HistoriTransaksi::findOrFail($id);
-    $histori->update($request->all());
+    $histori->jumlah = $request->jumlah;
+    $histori->jenis = $request->jenis;
+    $histori->oleh = $request->oleh;
+    $histori->divisi = $request->divisi;
+    $histori->keterangan = $request->keterangan;
+    $histori->created_at = $request->created_at; // <-- GANTI WAKTU DENGAN INPUTAN USER
+    $histori->save();
 
-    return redirect()->route('histori.histori')->with('success', 'Data berhasil diperbarui.');
+    return redirect()->back()->with('success', 'Histori berhasil diperbarui.');
 }
+
 
 public function destroy($id)
 {

@@ -140,6 +140,7 @@
                                 <th>Keterangan</th>
                                 <th>Waktu</th>
                                 <th>Aksi</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <!-- Tambahkan di bagian <tbody> -->
@@ -158,7 +159,8 @@
                                 <td>{{ $item->oleh }}</td>
                                 <td>{{ $item->divisi ?? '-' }}</td>
                                 <td>{{ $item->keterangan ?? '-' }}</td>
-                                <td>{{ $item->created_at->format('d-m-Y H:i') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y H:i') }}</td>
+
                                 <td>
                                     <!-- Tombol Edit -->
                                     <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
@@ -166,12 +168,13 @@
                                         ✏️ Edit
                                     </button>
 
+                                </td>
+                                <td>
                                     <!-- Tombol Hapus -->
                                     <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
                                         data-bs-target="#deleteModal{{ $item->id }}">
                                         🗑️ Hapus
-                                    </button>
-                                </td>
+                                    </button></td>
                             </tr>
 
                             <!-- Modal Edit -->
@@ -189,6 +192,20 @@
                                                     aria-label="Tutup"></button>
                                             </div>
                                             <div class="modal-body">
+                                                {{-- Nama Barang --}}
+                                                <div class="mb-3">
+                                                    <label>Nama Barang</label>
+                                                    <input type="text" class="form-control"
+                                                        value="{{ $item->barang->nama_barang ?? '-' }}" readonly>
+                                                </div>
+
+                                                {{-- QR Code --}}
+                                                <div class="mb-3">
+                                                    <label>Kode QR</label>
+                                                    <input type="text" class="form-control"
+                                                        value="{{ $item->barang->kode_qr ?? '-' }}" readonly>
+                                                </div>
+
                                                 <div class="mb-3">
                                                     <label>Jumlah</label>
                                                     <input type="number" name="jumlah" value="{{ $item->jumlah }}"
@@ -218,6 +235,12 @@
                                                     <label>Keterangan</label>
                                                     <textarea name="keterangan"
                                                         class="form-control">{{ $item->keterangan }}</textarea>
+                                                </div>
+                                                <div class="mb-3">
+                                                                      <label>Waktu</label>
+                                                    <input type="datetime-local" name="waktu"
+                                                        value="{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d\TH:i') }}"
+                                                        class="form-control" required>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -458,4 +481,5 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>

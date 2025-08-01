@@ -68,9 +68,14 @@
         </div>
 
         <div class="mb-3">
-          <label for="divisi" class="form-label">Divisi</label>
+          <label for         ="divisi" class="form-label">Divisi</label>
           <input type="text" name="divisi" class="form-control" autocomplete="off">
         </div>
+
+        <div class="mb-3">
+  <label for="created_at" class="form-label">Tanggal & Waktu Input</label>
+  <input type="datetime-local" name="created_at" class="form-control" required>
+</div>
 
         <div class="mb-3">
           <label for="keterangan" class="form-label">Keterangan</label>
