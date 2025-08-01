@@ -139,46 +139,132 @@
                                 <th>Divisi</th>
                                 <th>Keterangan</th>
                                 <th>Waktu</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
+                        <!-- Tambahkan di bagian <tbody> -->
                         <tbody id="historiBody">
-                            @php
-                            $totalMasuk = 0;
-                            $totalKeluar = 0;
-                            $stokBarang = [];
-                            @endphp
                             @forelse($histori as $index => $item)
-                            @php
-                            if ($item->jenis === 'in') {
-                            $totalMasuk += $item->jumlah;
-                            } else {
-                            $totalKeluar += $item->jumlah;
-                            }
-                            $namaBarang = $item->barang->nama_barang;
-                            if (!isset($stokBarang[$namaBarang])) {
-                            $stokBarang[$namaBarang] = 0;
-                            }
-                            $stokBarang[$namaBarang] += $item->jenis === 'in' ? $item->jumlah : -$item->jumlah;
-                            @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $item->barang->kode_qr }}</td>
                                 <td>{{ $item->barang->nama_barang }}</td>
-                                <td><span
-                                        class="badge bg-{{ $item->jenis === 'in' ? 'success' : 'danger' }}">{{ $item->jenis === 'in' ? 'Masuk' : 'Keluar' }}</span>
+                                <td>
+                                    <span class="badge bg-{{ $item->jenis === 'in' ? 'success' : 'danger' }}">
+                                        {{ $item->jenis === 'in' ? 'Masuk' : 'Keluar' }}
+                                    </span>
                                 </td>
                                 <td>{{ $item->jumlah }}</td>
                                 <td>{{ $item->oleh }}</td>
                                 <td>{{ $item->divisi ?? '-' }}</td>
                                 <td>{{ $item->keterangan ?? '-' }}</td>
                                 <td>{{ $item->created_at->format('d-m-Y H:i') }}</td>
+                                <td>
+                                    <!-- Tombol Edit -->
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                        data-bs-target="#editModal{{ $item->id }}">
+                                        ✏️ Edit
+                                    </button>
+
+                                    <!-- Tombol Hapus -->
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal{{ $item->id }}">
+                                        🗑️ Hapus
+                                    </button>
+                                </td>
                             </tr>
+
+                            <!-- Modal Edit -->
+                            <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1"
+                                aria-labelledby="editModalLabel{{ $item->id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <form action="{{ route('histori.update', $item->id) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editModalLabel{{ $item->id }}">Edit
+                                                    Transaksi</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Tutup"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label>Jumlah</label>
+                                                    <input type="number" name="jumlah" value="{{ $item->jumlah }}"
+                                                        class="form-control" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Jenis</label>
+                                                    <select name="jenis" class="form-control" required>
+                                                        <option value="in" {{ $item->jenis == 'in' ? 'selected' : '' }}>
+                                                            Masuk</option>
+                                                        <option value="out"
+                                                            {{ $item->jenis == 'out' ? 'selected' : '' }}>Keluar
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Oleh</label>
+                                                    <input type="text" name="oleh" value="{{ $item->oleh }}"
+                                                        class="form-control" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Divisi</label>
+                                                    <input type="text" name="divisi" value="{{ $item->divisi }}"
+                                                        class="form-control">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label>Keterangan</label>
+                                                    <textarea name="keterangan"
+                                                        class="form-control">{{ $item->keterangan }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">💾 Simpan</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal Hapus -->
+                            <div class="modal fade" id="deleteModal{{ $item->id }}" tabindex="-1"
+                                aria-labelledby="deleteModalLabel{{ $item->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="{{ route('histori.destroy', $item->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel{{ $item->id }}">Konfirmasi
+                                                    Hapus</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Tutup"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Apakah kamu yakin ingin menghapus transaksi
+                                                <strong>{{ $item->barang->nama_barang }}</strong> ({{ $item->jumlah }}
+                                                unit)?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-danger">🗑️ Hapus</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                             @empty
                             <tr>
-                                <td colspan="9" class="text-center">Belum ada histori transaksi.</td>
+                                <td colspan="10" class="text-center">Belum ada histori transaksi.</td>
                             </tr>
                             @endforelse
                         </tbody>
+
                     </table>
                     <div id="pagination" class="d-flex justify-content-center mt-3"></div>
                 </div>
@@ -344,35 +430,32 @@
                 }
             });
             // export stok
-
-    document.getElementById('exportStokExcel').addEventListener('click', function () {
-        // Sembunyikan pagination dan tampilkan semua baris sebelum export
-        const pagination = document.getElementById('paginationStok');
-        const rows = document.querySelectorAll('#stokBody tr');
-
-        // Simpan tampilan awal
-        const displayStyles = [];
-        rows.forEach((row, index) => {
-            displayStyles[index] = row.style.display;
-            row.style.display = ''; // Tampilkan semua
-        });
-
-        // Export
-        let table = document.getElementById('stokTable');
-        let wb = XLSX.utils.table_to_book(table, { sheet: "Stok Barang" });
-        XLSX.writeFile(wb, 'stok_barang.xlsx');
-
-        // Kembalikan tampilan awal
-        rows.forEach((row, index) => {
-            row.style.display = displayStyles[index];
-        });
-    });
-
+            document.getElementById('exportStokExcel').addEventListener('click', function() {
+                // Sembunyikan pagination dan tampilkan semua baris sebelum export
+                const pagination = document.getElementById('paginationStok');
+                const rows = document.querySelectorAll('#stokBody tr');
+                // Simpan tampilan awal
+                const displayStyles = [];
+                rows.forEach((row, index) => {
+                    displayStyles[index] = row.style.display;
+                    row.style.display = ''; // Tampilkan semua
+                });
+                // Export
+                let table = document.getElementById('stokTable');
+                let wb = XLSX.utils.table_to_book(table, {
+                    sheet: "Stok Barang"
+                });
+                XLSX.writeFile(wb, 'stok_barang.xlsx');
+                // Kembalikan tampilan awal
+                rows.forEach((row, index) => {
+                    row.style.display = displayStyles[index];
+                });
+            });
         </script>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-
 </html>

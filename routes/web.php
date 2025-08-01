@@ -28,3 +28,6 @@ Route::post('/histori/import', [HistoriTransaksiController::class, 'import'])->n
 Route::get('/barang/suggest', [BarangController::class, 'suggest']);
 
 Route::get('/histori/export-by-date', [HistoriTransaksiController::class, 'exportByDate'])->name('histori.exportByDate');
+
+Route::put('/histori/{id}', [HistoriTransaksiController::class, 'update'])->name('histori.update');
+Route::delete('/histori/{id}', [HistoriTransaksiController::class, 'destroy'])->name('histori.destroy');

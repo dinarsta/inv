@@ -81,11 +81,29 @@ class HistoriTransaksiController extends Controller
         return redirect()->back()->with('success', $pesan);
     }
 
-    public function histori()
-    {
-        $histori = HistoriTransaksi::with('barang')->orderByDesc('created_at')->get();
-        return view('histori', compact('histori'));
+public function histori()
+{
+    $histori = HistoriTransaksi::with('barang')->orderByDesc('created_at')->get();
+
+    // Hitung stok barang
+    $stokBarang = [];
+
+    foreach ($histori as $item) {
+        $nama = $item->barang->nama_barang;
+        if (!isset($stokBarang[$nama])) {
+            $stokBarang[$nama] = 0;
+        }
+
+        if ($item->jenis === 'in') {
+            $stokBarang[$nama] += $item->jumlah;
+        } else {
+            $stokBarang[$nama] -= $item->jumlah;
+        }
     }
+
+    return view('histori', compact('histori', 'stokBarang'));
+}
+
 
     public function dashboard()
     {
@@ -124,4 +142,30 @@ class HistoriTransaksiController extends Controller
 
     return Excel::download(new HistoriExportByDate($request->start_date, $request->end_date), 'histori_' . $request->start_date . '_to_' . $request->end_date . '.xlsx');
 }
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'jumlah' => 'required|integer|min:1',
+        'jenis' => 'required|in:in,out',
+        'oleh' => 'required|string',
+        'divisi' => 'nullable|string',
+        'keterangan' => 'nullable|string',
+    ]);
+
+    $histori = HistoriTransaksi::findOrFail($id);
+    $histori->update($request->all());
+
+    return redirect()->route('histori.histori')->with('success', 'Data berhasil diperbarui.');
+}
+
+public function destroy($id)
+{
+    $histori = HistoriTransaksi::findOrFail($id);
+    $histori->delete();
+
+    return redirect()->route('histori.histori')->with('success', 'Data berhasil dihapus.');
+}
+
+
 }
