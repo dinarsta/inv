@@ -153,8 +153,6 @@ public function update(Request $request, $id)
     $histori->oleh = $request->oleh;
     $histori->divisi = $request->divisi;
     $histori->keterangan = $request->keterangan;
-
-    // Update waktu ke created_at
     $histori->created_at = $request->waktu;
 
     $histori->save();
