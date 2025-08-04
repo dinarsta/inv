@@ -146,25 +146,20 @@ public function histori()
 
 public function update(Request $request, $id)
 {
-    $request->validate([
-        'jumlah' => 'required|numeric',
-        'jenis' => 'required|in:in,out',
-        'oleh' => 'required|string',
-        'divisi' => 'nullable|string',
-        'keterangan' => 'nullable|string',
-        'created_at' => 'required|date',
-    ]);
-
     $histori = HistoriTransaksi::findOrFail($id);
+
     $histori->jumlah = $request->jumlah;
     $histori->jenis = $request->jenis;
     $histori->oleh = $request->oleh;
     $histori->divisi = $request->divisi;
     $histori->keterangan = $request->keterangan;
-    $histori->created_at = $request->created_at; // <-- GANTI WAKTU DENGAN INPUTAN USER
+
+    // Update waktu ke created_at
+    $histori->created_at = $request->waktu;
+
     $histori->save();
 
-    return redirect()->back()->with('success', 'Histori berhasil diperbarui.');
+    return redirect()->back()->with('success', 'Data berhasil diperbarui!');
 }
 
 

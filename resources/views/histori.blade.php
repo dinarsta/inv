@@ -237,7 +237,7 @@
                                                         class="form-control">{{ $item->keterangan }}</textarea>
                                                 </div>
                                                 <div class="mb-3">
-                                                                      <label>Waktu</label>
+                                                    <label>Waktu</label>
                                                     <input type="datetime-local" name="waktu"
                                                         value="{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d\TH:i') }}"
                                                         class="form-control" required>
