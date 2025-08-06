@@ -11,29 +11,88 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <!-- Google Fonts (Optional) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
     <style>
         body {
-            background: #f8f9fa;
-            font-family: 'Segoe UI', sans-serif;
+            background: #f2f4f7;
+            font-family: 'Poppins', sans-serif;
         }
-        .card {
+
+        .login-card {
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            width: 100%;
+            max-width: 420px;
         }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+        }
+
         .form-control:focus {
-            box-shadow: none;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
             border-color: #0d6efd;
         }
+
         .btn-primary {
-            border-radius: 8px;
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+
+        .input-group-text {
+            background-color: transparent;
+            border: none;
+        }
+
+        .logo {
+            display: block;
+            margin: 0 auto 1rem;
+            width: 80px;
+        }
+
+        .login-title {
+            font-weight: 600;
+            text-align: center;
+            color: #333;
+        }
+
+        .form-footer {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .form-footer a {
+            color: #0d6efd;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-    <div class="card shadow-sm p-4" style="min-width: 400px;">
-        <h4 class="mb-4 text-center"><i class="fas fa-sign-in-alt me-2 text-primary"></i>Login</h4>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="login-card">
+        <!-- Logo -->
+        <img src="{{ asset('logo.png') }}" alt="Logo" class="logo">
+
+        <h4 class="login-title mb-4"><i class="fas fa-sign-in-alt me-2 text-primary"></i>Masuk ke Akun Anda</h4>
 
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -56,7 +115,7 @@
 
             <!-- Password -->
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">Kata Sandi</label>
                 <div class="input-group">
                     <input type="password" name="password" id="password" class="form-control" required>
                     <button class="btn btn-outline-secondary" type="button" id="togglePassword">
@@ -66,11 +125,12 @@
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-primary w-100">Masuk</button>
 
             <!-- Register Link -->
-            <div class="mt-3 text-center">
-                Belum punya akun? <a href="{{ url('/register') }}" class="text-decoration-none fw-semibold text-primary">Daftar di sini</a>
+            <div class="form-footer">
+                Belum punya akun?
+                <a href="{{ url('/register') }}">Daftar di sini</a>
             </div>
         </form>
     </div>

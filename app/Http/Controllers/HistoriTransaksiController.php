@@ -9,6 +9,7 @@ use App\Exports\HistoriExport;
 use App\Imports\HistoriImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\HistoriExportByDate;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriTransaksiController extends Controller
 {
@@ -93,14 +94,16 @@ public function histori()
 
     return view('histori', compact('histori', 'stokBarang'));
 }
-    public function dashboard()
-    {
-        $totalMasuk = HistoriTransaksi::where('jenis', 'in')->sum('jumlah');
-        $totalKeluar = HistoriTransaksi::where('jenis', 'out')->sum('jumlah');
-        $totalBarang = Barang::count();
+   public function dashboard()
+{
+    $totalMasuk = HistoriTransaksi::where('jenis', 'in')->sum('jumlah');
+    $totalKeluar = HistoriTransaksi::where('jenis', 'out')->sum('jumlah');
+    $totalBarang = Barang::count();
 
-        return view('dashboard', compact('totalMasuk', 'totalKeluar', 'totalBarang'));
-    }
+    $user = Auth::user(); // ambil data user yang sedang login
+
+    return view('dashboard', compact('totalMasuk', 'totalKeluar', 'totalBarang', 'user'));
+}
 
     public function export()
     {

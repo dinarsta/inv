@@ -1,58 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Form Barang Masuk</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-        }
+@section('title', 'Dashboard')
 
-        .card {
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-custom {
-            min-width: 150px;
-        }
-
-        .suggestion-box {
-            position: absolute;
-            z-index: 999;
-            background: white;
-            width: 100%;
-            border: 1px solid #ced4da;
-            border-top: none;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .suggestion-item {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .suggestion-item:hover {
-            background-color: #f1f1f1;
-        }
-
-        @media (max-width: 576px) {
-            .btn-custom {
-                width: 100%;
-            }
-
-            .form-wrapper {
-                padding: 1rem;
-            }
-        }
-    </style>
-</head>
-
-<body>
+@section('content')
 
     <div class="container-sm my-5 px-3">
         <div
@@ -264,6 +214,4 @@
 </script>
 
 
-</body>
-
-</html>
+@endsection

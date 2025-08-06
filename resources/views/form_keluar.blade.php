@@ -1,29 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Form Barang Keluar</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; }
-    .card { border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-    .btn-custom { min-width: 150px; }
-    .suggestion-box {
-      position: absolute; top: 100%; left: 0; z-index: 999; background: white;
-      width: 100%; border: 1px solid #ced4da; border-top: none;
-      max-height: 200px; overflow-y: auto;
-    }
-    .suggestion-item { padding: 10px; cursor: pointer; }
-    .suggestion-item:hover { background-color: #f1f1f1; }
-    @media (max-width: 576px) {
-      .btn-custom { width: 100%; }
-      .form-wrapper { padding: 1rem; }
-    }
-  </style>
-</head>
-<body class="bg-light">
+@extends('layouts.app')
+
+@section('title', 'Dashboard')
+
+@section('content')
 
 <div class="container-sm my-5 px-3">
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
@@ -103,9 +82,7 @@
   </div>
 </div>
 
-<footer class="text-center text-muted py-4 mt-5">
-  <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA</small>
-</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
@@ -227,6 +204,4 @@
     }).catch(err => console.error("Camera error", err));
   });
 </script>
-
-</body>
-</html>
+@endsection

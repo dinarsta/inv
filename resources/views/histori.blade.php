@@ -1,68 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Monitoring Histori Transaksi | PRIMANUSA</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+@section('title', 'Dashboard')
 
-    <style>
-        header,
-        footer {
-            padding: 1rem 0;
-            background-color: transparent;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        footer {
-            border-top: 1px solid #dee2e6;
-            border-bottom: none;
-        }
-
-        .alert-custom {
-            animation: fadeIn 1s ease-in-out;
-            margin-top: 1rem;
-        }
-
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 576px) {
-            h3 {
-                font-size: 1.25rem;
-            }
-
-            .btn {
-                margin-bottom: 8px;
-                width: 100%;
-            }
-
-            .header-flex {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 0.5rem;
-            }
-
-            table th,
-            table td {
-                font-size: 0.875rem;
-            }
-        }
-    </style>
-</head>
-
-<body class="bg-light">
+@section('content')
     <!-- Header -->
     <!-- Header -->
     <header class="bg-white shadow-sm py-3">
@@ -89,14 +29,6 @@
                         <i class="bi bi-box-arrow-up"></i> Barang Keluar
                     </a>
                     @endif
-
-                    <!-- Tombol Logout -->
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-secondary">
-                            <i class="bi bi-box-arrow-right"></i> Logout
-                        </button>
-                    </form>
                     @endauth
                 </div>
 
@@ -540,7 +472,4 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-</html>
+@endsection
