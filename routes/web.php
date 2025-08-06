@@ -4,6 +4,24 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\HistoriTransaksiController;
+use App\Http\Controllers\AuthController;
+
+// Halaman login
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+
+// Proses login
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/', [HistoriTransaksiController::class, 'dashboard'])->name('dashboard');
+
+// Halaman register (jika diperlukan)
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+
+// Proses register
+Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 
 // Menampilkan form barang masuk
 Route::get('/in', [HistoriTransaksiController::class, 'formMasuk']);
@@ -19,8 +37,6 @@ Route::get('/barang/cek/{kode_qr}', [BarangController::class, 'cekBarang']);
 
 Route::get('/histori', [HistoriTransaksiController::class, 'histori'])->name('histori.histori');
 
-Route::get('/', [HistoriTransaksiController::class, 'dashboard'])->name('dashboard');
-
 Route::get('/histori/export', [HistoriTransaksiController::class, 'export'])->name('histori.export');
 
 Route::post('/histori/import', [HistoriTransaksiController::class, 'import'])->name('histori.import');
@@ -30,4 +46,6 @@ Route::get('/barang/suggest', [BarangController::class, 'suggest']);
 Route::get('/histori/export-by-date', [HistoriTransaksiController::class, 'exportByDate'])->name('histori.exportByDate');
 
 Route::put('/histori/{id}', [HistoriTransaksiController::class, 'update'])->name('histori.update');
+
 Route::delete('/histori/{id}', [HistoriTransaksiController::class, 'destroy'])->name('histori.destroy');
+

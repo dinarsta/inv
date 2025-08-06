@@ -86,25 +86,14 @@ public function histori()
 {
     $histori = HistoriTransaksi::with('barang')->orderByDesc('created_at')->get();
 
-    // Hitung stok barang
-    $stokBarang = [];
+    // Ambil stok dari tabel barangs (dari kolom 'stok')
+    $stokBarang = Barang::select('nama_barang', 'stok')
+        ->get()
+        ->pluck('stok', 'nama_barang'); // hasil: [nama_barang => stok]
 
-    foreach ($histori as $item) {
-        $nama = $item->barang->nama_barang;
-        if (!isset($stokBarang[$nama])) {
-            $stokBarang[$nama] = 0;
-        }
-
-        if ($item->jenis === 'in') {
-            $stokBarang[$nama] += $item->jumlah;
-        } else {
-            $stokBarang[$nama] -= $item->jumlah;
-        }
-    }
 
     return view('histori', compact('histori', 'stokBarang'));
 }
-
 
     public function dashboard()
     {

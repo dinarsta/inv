@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Monitoring Histori Transaksi | PRIMANUSA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         header,
         footer {
@@ -61,52 +63,97 @@
 </head>
 
 <body class="bg-light">
-
+    <!-- Header -->
     <!-- Header -->
     <header class="bg-white shadow-sm py-3">
-        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <h3 class="mb-0 fw-bold d-flex align-items-center gap-2">📑 Monitoring Histori Transaksi</h3>
-            <div class="d-flex flex-wrap align-items-center gap-3">
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="/" class="btn btn-outline-primary">🏠 Home</a>
-                    <a href="/in" class="btn btn-outline-success">➕ Barang Masuk</a>
-                    <a href="/out" class="btn btn-outline-danger">➖ Barang Keluar</a>
-                </div>
-                <div class="bg-white border rounded p-3 shadow-sm">
-                    <form action="{{ route('histori.exportByDate') }}" method="GET" class="row g-3 align-items-end">
-                        <div class="col-md-4">
-                            <label for="start_date" class="form-label fw-medium">Dari Tanggal</label>
-                            <input type="date" name="start_date" id="start_date" class="form-control" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="end_date" class="form-label fw-medium">Sampai Tanggal</label>
-                            <input type="date" name="end_date" id="end_date" class="form-control" required>
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-outline-success">📤 Export</button>
-                        </div>
+        <div class="container">
+            <!-- Judul dan Navigasi -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-3">
+                <h3 class="mb-0 fw-bold text-center text-md-start">
+                    📑 Monitoring Histori Transaksi
+                </h3>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <!-- Tombol Home -->
+                    <a href="/" class="btn btn-outline-primary">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+
+                    <!-- Jika user login -->
+                    @auth
+                    <!-- Tombol khusus admin -->
+                    @if(auth()->user()->role === 'admin')
+                    <a href="/in" class="btn btn-outline-success">
+                        <i class="bi bi-box-arrow-in-down"></i> Barang Masuk
+                    </a>
+                    <a href="/out" class="btn btn-outline-danger">
+                        <i class="bi bi-box-arrow-up"></i> Barang Keluar
+                    </a>
+                    @endif
+
+                    <!-- Tombol Logout -->
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
                     </form>
+                    @endauth
+                </div>
+
+            </div>
+
+            <!-- Export & Import hanya untuk admin -->
+            @auth
+            @if(auth()->user()->role === 'admin')
+            <div class="row g-4">
+                <!-- Export By Date -->
+                <div class="col-12 col-lg-7">
+                    <div class="bg-white border rounded p-3 shadow-sm h-100">
+                        <form action="{{ route('histori.exportByDate') }}" method="GET" class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label fw-medium">
+                                    <i class="fa-regular fa-calendar-days"></i> Dari Tanggal
+                                </label>
+                                <input type="date" name="start_date" id="start_date" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label fw-medium">
+                                    <i class="fa-regular fa-calendar-days"></i> Sampai Tanggal
+                                </label>
+                                <input type="date" name="end_date" id="end_date" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-outline-success w-100">
+                                    <i class="fa-solid fa-file-export"></i> Export Excel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Import Excel -->
+                <div class="col-12 col-lg-5">
+                    <div class="bg-white border rounded p-3 shadow-sm h-100">
+                        <form action="{{ route('histori.import') }}" method="POST" enctype="multipart/form-data"
+                            class="row g-3 align-items-center">
+                            @csrf
+                            <div class="col-12">
+                                <label for="file" class="form-label fw-medium">📁 Pilih File Excel</label>
+                                <input type="file" name="file" id="file" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning w-100">📥 Import Excel</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
+            @endif
+            @endauth
         </div>
     </header>
 
     <div class="container mt-4 mb-5">
-
-        <!-- Import Excel -->
-        <div class="bg-white border rounded p-3 shadow-sm mb-4">
-            <form action="{{ route('histori.import') }}" method="POST" enctype="multipart/form-data"
-                class="row g-3 align-items-center">
-                @csrf
-                <div class="col-md-6 col-sm-12">
-                    <input type="file" name="file" class="form-control" required>
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-warning">📤 Import Excel</button>
-                </div>
-            </form>
-        </div>
-
         <!-- Tabs -->
         <ul class="nav nav-tabs mb-3" id="dataTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -139,11 +186,12 @@
                                 <th>Divisi</th>
                                 <th>Keterangan</th>
                                 <th>Waktu</th>
-                                <th>Aksi</th>
-                                <th></th>
+                                @if(Auth::check() && Auth::user()->role === 'admin')
+                                <th colspan="2">Aksi</th>
+                                @endif
                             </tr>
                         </thead>
-                        <!-- Tambahkan di bagian <tbody> -->
+
                         <tbody id="historiBody">
                             @forelse($histori as $index => $item)
                             <tr>
@@ -161,127 +209,130 @@
                                 <td>{{ $item->keterangan ?? '-' }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y H:i') }}</td>
 
+                                @if(Auth::check() && Auth::user()->role === 'admin')
                                 <td>
-                                    <!-- Tombol Edit -->
                                     <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                                         data-bs-target="#editModal{{ $item->id }}">
-                                        ✏️ Edit
+                                        <i class="bi bi-pencil-square"></i> Edit
                                     </button>
-
                                 </td>
                                 <td>
-                                    <!-- Tombol Hapus -->
                                     <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
                                         data-bs-target="#deleteModal{{ $item->id }}">
-                                        🗑️ Hapus
-                                    </button></td>
-                            </tr>
+                                        <i class="bi bi-trash"></i> Hapus
+                                    </button>
+                                </td>
+                                @endif
 
-                            <!-- Modal Edit -->
-                            <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1"
-                                aria-labelledby="editModalLabel{{ $item->id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <form action="{{ route('histori.update', $item->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="editModalLabel{{ $item->id }}">Edit
-                                                    Transaksi</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Tutup"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                {{-- Nama Barang --}}
-                                                <div class="mb-3">
-                                                    <label>Nama Barang</label>
-                                                    <input type="text" class="form-control"
-                                                        value="{{ $item->barang->nama_barang ?? '-' }}" readonly>
+                                {{-- modals --}}
+                                <!-- Modal Edit -->
+                                <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1"
+                                    aria-labelledby="editModalLabel{{ $item->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <form action="{{ route('histori.update', $item->id) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editModalLabel{{ $item->id }}">Edit
+                                                        Transaksi</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Tutup"></button>
                                                 </div>
+                                                <div class="modal-body">
+                                                    {{-- Nama Barang --}}
+                                                    <div class="mb-3">
+                                                        <label>Nama Barang</label>
+                                                        <input type="text" class="form-control"
+                                                            value="{{ $item->barang->nama_barang ?? '-' }}" readonly>
+                                                    </div>
 
-                                                {{-- QR Code --}}
-                                                <div class="mb-3">
-                                                    <label>Kode QR</label>
-                                                    <input type="text" class="form-control"
-                                                        value="{{ $item->barang->kode_qr ?? '-' }}" readonly>
-                                                </div>
+                                                    {{-- QR Code --}}
+                                                    <div class="mb-3">
+                                                        <label>Kode QR</label>
+                                                        <input type="text" class="form-control"
+                                                            value="{{ $item->barang->kode_qr ?? '-' }}" readonly>
+                                                    </div>
 
-                                                <div class="mb-3">
-                                                    <label>Jumlah</label>
-                                                    <input type="number" name="jumlah" value="{{ $item->jumlah }}"
-                                                        class="form-control" required>
+                                                    <div class="mb-3">
+                                                        <label>Jumlah</label>
+                                                        <input type="number" name="jumlah" value="{{ $item->jumlah }}"
+                                                            class="form-control" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>Jenis</label>
+                                                        <select name="jenis" class="form-control" required>
+                                                            <option value="in"
+                                                                {{ $item->jenis == 'in' ? 'selected' : '' }}>
+                                                                Masuk</option>
+                                                            <option value="out"
+                                                                {{ $item->jenis == 'out' ? 'selected' : '' }}>Keluar
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>Oleh</label>
+                                                        <input type="text" name="oleh" value="{{ $item->oleh }}"
+                                                            class="form-control" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>Divisi</label>
+                                                        <input type="text" name="divisi" value="{{ $item->divisi }}"
+                                                            class="form-control">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>Keterangan</label>
+                                                        <textarea name="keterangan"
+                                                            class="form-control">{{ $item->keterangan }}</textarea>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>Waktu</label>
+                                                        <input type="datetime-local" name="waktu"
+                                                            value="{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d\TH:i') }}"
+                                                            class="form-control" required>
+                                                    </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label>Jenis</label>
-                                                    <select name="jenis" class="form-control" required>
-                                                        <option value="in" {{ $item->jenis == 'in' ? 'selected' : '' }}>
-                                                            Masuk</option>
-                                                        <option value="out"
-                                                            {{ $item->jenis == 'out' ? 'selected' : '' }}>Keluar
-                                                        </option>
-                                                    </select>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Batal</button>
+                                                    <button type="submit" class="btn btn-primary">💾 Simpan</button>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label>Oleh</label>
-                                                    <input type="text" name="oleh" value="{{ $item->oleh }}"
-                                                        class="form-control" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label>Divisi</label>
-                                                    <input type="text" name="divisi" value="{{ $item->divisi }}"
-                                                        class="form-control">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label>Keterangan</label>
-                                                    <textarea name="keterangan"
-                                                        class="form-control">{{ $item->keterangan }}</textarea>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label>Waktu</label>
-                                                    <input type="datetime-local" name="waktu"
-                                                        value="{{ \Carbon\Carbon::parse($item->created_at)->format('Y-m-d\TH:i') }}"
-                                                        class="form-control" required>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-primary">💾 Simpan</button>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Modal Hapus -->
-                            <div class="modal fade" id="deleteModal{{ $item->id }}" tabindex="-1"
-                                aria-labelledby="deleteModalLabel{{ $item->id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form action="{{ route('histori.destroy', $item->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="deleteModalLabel{{ $item->id }}">Konfirmasi
-                                                    Hapus</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Tutup"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Apakah kamu yakin ingin menghapus transaksi
-                                                <strong>{{ $item->barang->nama_barang }}</strong> ({{ $item->jumlah }}
-                                                unit)?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Batal</button>
-                                                <button type="submit" class="btn btn-danger">🗑️ Hapus</button>
-                                            </div>
-                                        </form>
+                                <!-- Modal Hapus -->
+                                <div class="modal fade" id="deleteModal{{ $item->id }}" tabindex="-1"
+                                    aria-labelledby="deleteModalLabel{{ $item->id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="{{ route('histori.destroy', $item->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteModalLabel{{ $item->id }}">
+                                                        Konfirmasi
+                                                        Hapus</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Tutup"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Apakah kamu yakin ingin menghapus transaksi
+                                                    <strong>{{ $item->barang->nama_barang }}</strong>
+                                                    ({{ $item->jumlah }}
+                                                    unit)?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Batal</button>
+                                                    <button type="submit" class="btn btn-danger">🗑️ Hapus</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            @empty
+                                @empty
                             <tr>
                                 <td colspan="10" class="text-center">Belum ada histori transaksi.</td>
                             </tr>
@@ -292,7 +343,7 @@
                     <div id="pagination" class="d-flex justify-content-center mt-3"></div>
                 </div>
             </div>
-
+            {{-- end modals --}}
             <!-- Tab Stok -->
             <div class="tab-pane fade" id="stok" role="tabpanel">
                 <div class="table-responsive bg-white p-3 border rounded shadow-sm">
@@ -301,29 +352,34 @@
                         <input type="text" id="searchStokInput" class="form-control w-auto"
                             placeholder="🔍 Cari Nama Barang...">
                     </div>
+                    @auth
+                    @if(auth()->user()->role === 'admin')
                     <div class="mb-4">
                         <button id="exportStokExcel" class="btn btn-success">
                             📁 Export Excel
                         </button>
                     </div>
+                    @endif
+                    @endauth
+
                     <table class="table table-bordered table-striped table-hover" id="stokTable">
                         <thead class="table-secondary">
-                            <tr>
+                            <thead class="table-secondary">
+                                <th>Kode Barang</th>
                                 <th>Nama Barang</th>
                                 <th>Sisa Stok (unit)</th>
-                            </tr>
+                            </thead>
                         </thead>
                         <tbody id="stokBody">
-                            @forelse ($stokBarang as $nama => $stok)
-                            <tr class="{{ $stok < 3 ? 'table-danger' : '' }}">
-                                <td>{{ $nama }}</td>
-                                <td><strong>{{ $stok }}</strong></td>
+                            @foreach($histori as $item)
+                            <tr
+                                class="{{ isset($stokBarang[$item->barang->nama_barang]) && $stokBarang[$item->barang->nama_barang] < 3 ? 'table-danger' : '' }}">
+
+                                 <td>{{ $item->barang->kode_qr }}</td>
+                                <td>{{ $item->barang->nama_barang }}</td>
+                                <td>{{ $item->jumlah }}</td>
                             </tr>
-                            @empty
-                            <tr>
-                                <td colspan="2" class="text-center">Belum ada data stok barang.</td>
-                            </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
 

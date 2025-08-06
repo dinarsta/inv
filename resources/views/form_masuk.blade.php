@@ -1,119 +1,151 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Form Barang Masuk</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; }
-    .card { border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .btn-custom { min-width: 150px; }
-    .suggestion-box {
-      position: absolute;
-      z-index: 999;
-      background: white;
-      width: 100%;
-      border: 1px solid #ced4da;
-      border-top: none;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .suggestion-item { padding: 10px; cursor: pointer; }
-    .suggestion-item:hover { background-color: #f1f1f1; }
-    @media (max-width: 576px) {
-      .btn-custom { width: 100%; }
-      .form-wrapper { padding: 1rem; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form Barang Masuk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-custom {
+            min-width: 150px;
+        }
+
+        .suggestion-box {
+            position: absolute;
+            z-index: 999;
+            background: white;
+            width: 100%;
+            border: 1px solid #ced4da;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        @media (max-width: 576px) {
+            .btn-custom {
+                width: 100%;
+            }
+
+            .form-wrapper {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container-sm my-5 px-3">
-  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
-    <h4 class="mb-2 mb-md-0">📥 Form Barang Masuk</h4>
-    <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
-      <a href="/" class="btn btn-outline-secondary btn-custom">← Kembali</a>
-      <a href="/histori" class="btn btn-outline-primary btn-custom">📜 Lihat Histori</a>
+    <div class="container-sm my-5 px-3">
+        <div
+            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
+            <h4 class="mb-2 mb-md-0">📥 Form Barang Masuk</h4>
+            <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-md-auto">
+                <a href="/" class="btn btn-outline-secondary btn-custom">← Kembali</a>
+                <a href="/histori" class="btn btn-outline-primary btn-custom">📜 Lihat Histori</a>
+            </div>
+        </div>
+
+        <div class="card p-4 bg-white form-wrapper position-relative">
+            <form method="POST" action="{{ route('transaksi.store') }}">
+                @csrf
+                <input type="hidden" name="jenis" value="in">
+
+                <div class="mb-3 position-relative">
+                    <label for="kode_qr" class="form-label">Scan Kode QR / Barcode</label>
+                    <input type="text" name="kode_qr" id="kode_qr" class="form-control" required autocomplete="off">
+                    <button type="button" id="scan-btn" class="btn btn-outline-secondary w-100 d-sm-none mt-2">📷 Scan
+                        Barcode</button>
+                    <div id="qr-reader" style="display: none;" class="my-3"></div>
+
+                    <!-- Kotak Saran -->
+                    <div id="suggestions" class="suggestion-box d-none">
+                        <!-- Diisi otomatis oleh JavaScript -->
+                    </div>
+                </div>
+
+                <div id="form-lengkap">
+                    <div class="mb-3">
+                        <label for="nama_barang" class="form-label">Nama Barang</label>
+                        <input type="text" name="nama_barang" id="nama_barang" class="form-control" autocomplete="off">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="jumlah" class="form-label">Jumlah Masuk</label>
+                        <input type="number" name="jumlah" class="form-control" required min="1">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="oleh" class="form-label">Di‑Input Oleh</label>
+                        <input type="text" name="oleh" class="form-control" required autocomplete="off">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="divisi" class="form-label">Divisi</label>
+                        <input type="text" name="divisi" class="form-control" autocomplete="off">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="created_at" class="form-label">Tanggal & Waktu Input</label>
+                        <input type="datetime-local" name="created_at" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="keterangan" class="form-label">Keterangan</label>
+                        <textarea name="keterangan" class="form-control" rows="3" autocomplete="off"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">💾 Simpan Barang Masuk</button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
 
-  <div class="card p-4 bg-white form-wrapper position-relative">
-    <form method="POST" action="{{ route('transaksi.store') }}">
-      @csrf
-      <input type="hidden" name="jenis" value="in">
-
-      <div class="mb-3 position-relative">
-        <label for="kode_qr" class="form-label">Scan Kode QR / Barcode</label>
-        <input type="text" name="kode_qr" id="kode_qr" class="form-control" required autocomplete="off">
-        <button type="button" id="scan-btn" class="btn btn-outline-secondary w-100 d-sm-none mt-2">📷 Scan Barcode</button>
-        <div id="qr-reader" style="display: none;" class="my-3"></div>
-        <div id="suggestions" class="suggestion-box d-none"></div>
-      </div>
-
-      <div id="form-lengkap">
-        <div class="mb-3">
-          <label for="nama_barang" class="form-label">Nama Barang</label>
-          <input type="text" name="nama_barang" id="nama_barang" class="form-control" autocomplete="off">
+    <!-- Modal jika barang belum terdaftar -->
+    <div class="modal fade" id="barangModal" tabindex="-1" aria-labelledby="barangModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-body py-5 text-center">
+                    <div class="text-danger fs-1 mb-3">⚠️</div>
+                    <h5 class="modal-title fw-bold text-uppercase" id="barangModalLabel">Barang Belum Terdaftar</h5>
+                    <p class="mt-2 mb-4">Silakan isi data barang terlebih dahulu..</p>
+                    <button type="button" class="btn btn-danger px-4" id="modal-oke"
+                        data-bs-dismiss="modal">OKE</button>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-3">
-          <label for="jumlah" class="form-label">Jumlah Masuk</label>
-          <input type="number" name="jumlah" class="form-control" required min="1">
-        </div>
-
-        <div class="mb-3">
-          <label for="oleh" class="form-label">Di‑Input Oleh</label>
-          <input type="text" name="oleh" class="form-control" required autocomplete="off">
-        </div>
-
-        <div class="mb-3">
-          <label for         ="divisi" class="form-label">Divisi</label>
-          <input type="text" name="divisi" class="form-control" autocomplete="off">
-        </div>
-
-        <div class="mb-3">
-  <label for="created_at" class="form-label">Tanggal & Waktu Input</label>
-  <input type="datetime-local" name="created_at" class="form-control" required>
-</div>
-
-        <div class="mb-3">
-          <label for="keterangan" class="form-label">Keterangan</label>
-          <textarea name="keterangan" class="form-control" rows="3" autocomplete="off"></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-success w-100">💾 Simpan Barang Masuk</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal jika barang belum terdaftar -->
-<div class="modal fade" id="barangModal" tabindex="-1" aria-labelledby="barangModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg rounded-4">
-      <div class="modal-body py-5 text-center">
-        <div class="text-danger fs-1 mb-3">⚠️</div>
-        <h5 class="modal-title fw-bold text-uppercase" id="barangModalLabel">Barang Belum Terdaftar</h5>
-        <p class="mt-2 mb-4">Silakan isi data barang terlebih dahulu..</p>
-        <button type="button" class="btn btn-danger px-4" id="modal-oke" data-bs-dismiss="modal">OKE</button>
-      </div>
     </div>
-  </div>
-</div>
 
-<footer class="footer text-center text-muted py-4 mt-5">
-  <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA</small>
-</footer>
+    <footer class="footer text-center text-muted py-4 mt-5">
+        <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA</small>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
   const kodeInput = document.getElementById('kode_qr');
   const suggestionsBox = document.getElementById('suggestions');
-
   let timeout = null;
 
+  // Auto Suggest
   kodeInput.addEventListener('input', function () {
     const query = this.value.trim();
     clearTimeout(timeout);
@@ -124,7 +156,7 @@
     }
 
     timeout = setTimeout(() => {
-      fetch(`/barang/suggest?q=${query}`)
+      fetch(`/barang/suggest?q=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
           if (data.length > 0) {
@@ -132,7 +164,7 @@
             data.forEach(item => {
               const div = document.createElement('div');
               div.className = 'suggestion-item';
-              div.textContent = item.kode_qr;
+              div.innerHTML = `<strong>${item.kode_qr}</strong> – <span class="text-muted">${item.nama_barang}</span>`;
               div.onclick = () => {
                 kodeInput.value = item.kode_qr;
                 suggestionsBox.classList.add('d-none');
@@ -144,21 +176,26 @@
           } else {
             suggestionsBox.classList.add('d-none');
           }
+        })
+        .catch(err => {
+          console.error('Gagal ambil saran:', err);
         });
     }, 300);
   });
 
+  // Sembunyikan saran saat klik di luar
   document.addEventListener('click', function (e) {
     if (!suggestionsBox.contains(e.target) && e.target !== kodeInput) {
       suggestionsBox.classList.add('d-none');
     }
   });
 
+  // Cek Barang berdasarkan kode_qr
   function cekBarang() {
     const kodeQR = kodeInput.value.trim();
     if (kodeQR === '') return;
 
-    fetch(`/barang/cek/${kodeQR}`)
+    fetch(`/barang/cek/${encodeURIComponent(kodeQR)}`)
       .then(response => response.json())
       .then(data => {
         const namaInput = document.getElementById('nama_barang');
@@ -185,8 +222,7 @@
       });
   }
 
-
-  // QR SCAN BUTTON
+  // QR Scanner
   const scanBtn = document.getElementById('scan-btn');
   const qrReader = document.getElementById('qr-reader');
   let html5QrCode;
@@ -205,7 +241,9 @@
 
     Html5Qrcode.getCameras().then(devices => {
       if (devices && devices.length) {
-        let backCamera = devices.find(device => device.label.toLowerCase().includes('back')) || devices[devices.length - 1];
+        let backCamera = devices.find(device =>
+          device.label.toLowerCase().includes('back')
+        ) || devices[devices.length - 1];
         const cameraId = backCamera.id;
 
         html5QrCode.start(
@@ -218,12 +256,14 @@
               cekBarang();
             }).catch(err => console.error("Stop error", err));
           },
-          error => {} // silent
+          error => { /* silent */ }
         ).catch(err => console.error("Start error", err));
       }
     }).catch(err => console.error("Camera error", err));
   });
 </script>
 
+
 </body>
+
 </html>

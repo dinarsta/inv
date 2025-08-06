@@ -106,7 +106,6 @@
 <footer class="text-center text-muted py-4 mt-5">
   <small>&copy; {{ date('Y') }} PRIMANUSA MUKTI UTAMA</small>
 </footer>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
@@ -162,7 +161,7 @@
             data.forEach(item => {
               const div = document.createElement('div');
               div.className = 'suggestion-item';
-              div.textContent = item.kode_qr;
+              div.innerHTML = `<strong>${item.kode_qr}</strong> – <span class="text-muted">${item.nama_barang}</span>`;
               div.onclick = () => {
                 kodeInput.value = item.kode_qr;
                 suggestionsBox.classList.add('d-none');
@@ -222,11 +221,12 @@
               cekBarang();
             }).catch(err => console.error("Stop error", err));
           },
-          error => {} // bisa abaikan error ini
+          error => {} // abaikan error kecil
         ).catch(err => console.error("Start error", err));
       }
     }).catch(err => console.error("Camera error", err));
   });
 </script>
+
 </body>
 </html>

@@ -24,21 +24,19 @@ class HistoriExportByDate implements FromCollection, WithHeadings, WithMapping
             ->whereBetween('created_at', [$this->start . ' 00:00:00', $this->end . ' 23:59:59'])
             ->get();
     }
-
-    public function map($row): array
-    {
-        return [
-            $row->barang->kode_qr ?? '',
-            $row->barang->nama_barang ?? '',
-            $row->jenis,
-            $row->jumlah,
-            $row->oleh,
-            $row->divisi,
-            $row->keterangan,
-            $row->created_at->format('d-m-Y H:i'),
-        ];
-    }
-
+public function map($row): array
+{
+    return [
+        $row->barang->kode_qr ?? '',
+        $row->barang->nama_barang ?? '',
+        $row->jenis,
+        $row->jumlah,
+        $row->oleh,
+        $row->divisi,
+        $row->keterangan,
+        Carbon::parse($row->created_at)->format('d-m-Y H:i'),
+    ];
+}
     public function headings(): array
     {
         return [
