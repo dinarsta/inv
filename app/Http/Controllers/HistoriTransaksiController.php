@@ -91,10 +91,8 @@ public function histori()
         ->get()
         ->pluck('stok', 'nama_barang'); // hasil: [nama_barang => stok]
 
-
     return view('histori', compact('histori', 'stokBarang'));
 }
-
     public function dashboard()
     {
         $totalMasuk = HistoriTransaksi::where('jenis', 'in')->sum('jumlah');

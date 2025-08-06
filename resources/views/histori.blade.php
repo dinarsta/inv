@@ -364,21 +364,26 @@
 
                     <table class="table table-bordered table-striped table-hover" id="stokTable">
                         <thead class="table-secondary">
-                            <thead class="table-secondary">
+                            <tr>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
                                 <th>Sisa Stok (unit)</th>
-                            </thead>
+                            </tr>
                         </thead>
                         <tbody id="stokBody">
-                            @foreach($histori as $item)
-                            <tr
-                                class="{{ isset($stokBarang[$item->barang->nama_barang]) && $stokBarang[$item->barang->nama_barang] < 3 ? 'table-danger' : '' }}">
+                            @foreach($stokBarang as $nama => $stok)
+                            @php
+                            // Cari kode QR dari barang berdasarkan nama
+                            $barang = $histori->firstWhere('barang.nama_barang', $nama)?->barang;
+                            @endphp
 
-                                 <td>{{ $item->barang->kode_qr }}</td>
-                                <td>{{ $item->barang->nama_barang }}</td>
-                                <td>{{ $item->jumlah }}</td>
+                            @if($barang)
+                            <tr class="{{ $stok < 3 ? 'table-danger' : '' }}">
+                                <td>{{ $barang->kode_qr }}</td>
+                                <td>{{ $barang->nama_barang }}</td>
+                                <td>{{ $stok }}</td>
                             </tr>
+                            @endif
                             @endforeach
                         </tbody>
                     </table>
