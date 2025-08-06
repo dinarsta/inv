@@ -1,84 +1,33 @@
 <?php
 
-namespace App\Http\Controllers;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Models\ActivityLog;
-use Carbon\Carbon;
-
-class AuthController extends Controller
+class CreateActivityLogsTable extends Migration
 {
-    public function showLoginForm()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        return view('auth.login'); // Buat file resources/views/auth/login.blade.php
+        Schema::create('activity_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->timestamp('login_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('logout_at')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->text('user_agent')->nullable();
+            $table->string('keterangan')->nullable();
+            $table->timestamps();
+        });
     }
 
-    public function login(Request $request)
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            // Simpan log login
-            ActivityLog::create([
-                'user_id' => Auth::id(),
-                'login_at' => Carbon::now(),
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'keterangan' => 'Login berhasil',
-            ]);
-
-            return redirect()->intended('/');
-        }
-
-        return back()->withErrors(['email' => 'Email atau password salah']);
-    }
-
-    public function logout(Request $request)
-    {
-        $user = Auth::user();
-
-        // Update logout_at di log terakhir
-        ActivityLog::where('user_id', $user->id)
-            ->whereNull('logout_at')
-            ->latest()
-            ->first()?->update([
-                'logout_at' => Carbon::now(),
-                'keterangan' => 'Logout berhasil',
-            ]);
-
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/login');
-    }
-
-    public function showRegistrationForm()
-    {
-        return view('auth.register');
-    }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            // 'role' => 'required|in:admin,readonly',
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            // 'role' => $request->role,
-        ]);
-
-        return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login.');
+        Schema::dropIfExists('activity_logs');
     }
 }
