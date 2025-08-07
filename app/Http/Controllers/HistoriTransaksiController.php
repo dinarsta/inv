@@ -3,25 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Barang;
+use App\Models\ActivityLog;
 use App\Models\HistoriTransaksi;
 use App\Exports\HistoriExport;
 use App\Imports\HistoriImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\HistoriExportByDate;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Barang;
 
 class HistoriTransaksiController extends Controller
 {
-    public function formMasuk()
-    {
-        return view('form_masuk');
-    }
+public function formMasuk()
+{
+    $user = Auth::user(); // Ambil data user yang sedang login
+    return view('form_masuk', compact('user'));
+}
 
-    public function formKeluar()
-    {
-        return view('form_keluar');
-    }
+public function formKeluar()
+{
+    $user = Auth::user(); // Ambil data user yang sedang login
+    return view('form_keluar', compact('user'));
+}
 
     public function store(Request $request)
     {
@@ -60,16 +63,29 @@ class HistoriTransaksiController extends Controller
             }
             $barang->save();
         }
+        $histori = HistoriTransaksi::create([
+    'barang_id' => $barang->id,
+    'user_id' => Auth::id(), // ✅ Wajib agar tidak error
+    'jenis' => $request->jenis,
+    'jumlah' => $request->jumlah,
+    'oleh' => Auth::user()->name, // Otomatis dari user login
+    'divisi' => $request->divisi,
+    'created_at' => $request->created_at,
+    'keterangan' => $request->keterangan,
+]);
 
-        HistoriTransaksi::create([
-            'barang_id' => $barang->id,
-            'jenis' => $request->jenis,
-            'jumlah' => $request->jumlah,
-            'oleh' => $request->oleh,
-            'divisi' => $request->divisi,
-            'created_at' => $request->created_at,
-            'keterangan' => $request->keterangan,
-        ]);
+// ✅ Tambahkan log aktivitas ke activity_logs
+ActivityLog::create([
+    'user_id' => Auth::id(),
+    'login_at' => now(), // Gunakan waktu sekarang
+    'ip_address' => request()->ip(),
+    'user_agent' => request()->userAgent(),
+    'keterangan' => 'Transaksi ' . $request->jenis,
+    'aktivitas_detail' => Auth::user()->name . ' dari divisi ' . $request->divisi .
+        ' melakukan transaksi ' . ($request->jenis === 'in' ? 'masuk' : 'keluar') .
+        ' pada tanggal ' . now()->format('Y-m-d H:i'),
+]);
+
 
         // Buat pesan sukses
         if ($request->jenis === 'in' && $isNew) {
@@ -92,8 +108,12 @@ public function histori()
         ->get()
         ->pluck('stok', 'nama_barang'); // hasil: [nama_barang => stok]
 
-    return view('histori', compact('histori', 'stokBarang'));
+    // Ambil data terakhir dari activity_logs
+    $lastActivity = \App\Models\ActivityLog::orderByDesc('created_at')->first();
+
+    return view('histori', compact('histori', 'stokBarang', 'lastActivity'));
 }
+
    public function dashboard()
 {
     $totalMasuk = HistoriTransaksi::where('jenis', 'in')->sum('jumlah');
@@ -138,14 +158,31 @@ public function update(Request $request, $id)
 {
     $histori = HistoriTransaksi::findOrFail($id);
 
+    // Simpan data lama sebelum diubah (optional tapi disarankan)
+    $original = $histori->getOriginal();
+
+    // Update histori transaksi
     $histori->jumlah = $request->jumlah;
     $histori->jenis = $request->jenis;
     $histori->oleh = $request->oleh;
     $histori->divisi = $request->divisi;
     $histori->keterangan = $request->keterangan;
     $histori->created_at = $request->waktu;
-
     $histori->save();
+
+    // ✅ Tambahkan log aktivitas perubahan
+    ActivityLog::create([
+        'user_id' => Auth::id(),
+        'ip_address' => request()->ip(),
+        'user_agent' => request()->userAgent(),
+        'keterangan' => 'Edit Transaksi',
+        'aktivitas_detail' => Auth::user()->name .
+            ' mengedit transaksi ID ' . $id .
+            ' dari: [jenis: ' . $original['jenis'] . ', jumlah: ' . $original['jumlah'] . '] ' .
+            'ke: [jenis: ' . $request->jenis . ', jumlah: ' . $request->jumlah . '] ' .
+            'pada ' . now()->format('Y-m-d H:i'),
+        'login_at' => now(), // Sebagai timestamp umum untuk aktivitas
+    ]);
 
     return redirect()->back()->with('success', 'Data berhasil diperbarui!');
 }

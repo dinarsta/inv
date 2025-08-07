@@ -38,25 +38,28 @@ class AuthController extends Controller
         return back()->withErrors(['email' => 'Email atau password salah']);
     }
 
-    public function logout(Request $request)
-    {
-        $user = Auth::user();
+public function logout(Request $request)
+{
+    $user = Auth::user();
 
-        // Update logout_at di log terakhir
-        ActivityLog::where('user_id', $user->id)
-            ->whereNull('logout_at')
-            ->latest()
-            ->first()?->update([
-                'logout_at' => Carbon::now(),
-                'keterangan' => 'Logout berhasil',
-            ]);
+    // ✅ Tambahkan baris baru untuk aktivitas logout
+    ActivityLog::create([
+        'user_id' => $user->id,
+        'logout_at' => Carbon::now(),
+        'ip_address' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+        'keterangan' => 'Logout',
+        'aktivitas_detail' => $user->name . ' telah logout pada ' . now()->format('Y-m-d H:i'),
+    ]);
 
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    // Lakukan logout seperti biasa
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-        return redirect('/login');
-    }
+    return redirect('/login');
+}
+
 
     public function showRegistrationForm()
     {

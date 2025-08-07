@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriImport implements ToCollection
 {
@@ -16,36 +17,53 @@ class HistoriImport implements ToCollection
         // Lewati baris pertama (header)
         $rows->shift();
 
-        foreach ($rows as $row) {
-            $kodeQr     = (string) $row[0];
-            $namaBarang = $row[1];
-            $jenis      = strtolower($row[2]) === 'masuk' ? 'in' : 'out';
-            $jumlah     = (int) $row[3];
-            $oleh       = $row[4];
-            $divisi     = $row[5];
-            $keterangan = $row[6];
+        foreach ($rows as $index => $row) {
+            // Cek jumlah kolom minimal
+            if (count($row) < 8) {
+                continue;
+            }
 
-       // Cek dan ubah format tanggal dari Excel
-$waktu = null;
+            $kodeQr     = (string) ($row[0] ?? null);
+            $namaBarang = $row[1] ?? null;
+            $jenisRaw   = strtolower(trim($row[2] ?? ''));
+            $jumlah     = (int) ($row[3] ?? 0);
+            $oleh       = $row[4] ?? null;
+            $divisi     = $row[5] ?? null;
+            $keterangan = $row[6] ?? null;
+            $waktuRaw   = $row[7] ?? null;
 
-if (is_numeric($row[7])) {
-    // Format Excel (serial number)
-    $waktu = Carbon::instance(Date::excelToDateTimeObject($row[7]));
-} else {
-    // Format teks (ex: 2025-08-01 14:30:00)
-    try {
-        $waktu = Carbon::parse($row[7]);
-    } catch (\Exception $e) {
-        // Lewati baris jika format tidak valid
-        continue;
-    }
-}
+            // Validasi jenis transaksi
+            if (in_array($jenisRaw, ['masuk', 'in'])) {
+                $jenis = 'in';
+            } elseif (in_array($jenisRaw, ['keluar', 'out'])) {
+                $jenis = 'out';
+            } else {
+                continue; // jenis tidak valid
+            }
 
-            // Cek apakah barang sudah ada
+            // Skip jika data penting kosong
+            if (!$kodeQr || !$namaBarang || !$oleh || !$jumlah) {
+                continue;
+            }
+
+            // Ubah format tanggal dari Excel
+            $waktu = null;
+            if (is_numeric($waktuRaw)) {
+                // Format Excel serial number
+                $waktu = Carbon::instance(Date::excelToDateTimeObject($waktuRaw));
+            } else {
+                try {
+                    $waktu = Carbon::parse($waktuRaw);
+                } catch (\Exception $e) {
+                    continue; // Format tanggal salah
+                }
+            }
+
+            // Cari barang berdasarkan kode QR
             $barang = Barang::where('kode_qr', $kodeQr)->first();
 
             if (!$barang) {
-                // Buat barang baru
+                // Buat barang baru jika belum ada
                 $barang = Barang::create([
                     'kode_qr'     => $kodeQr,
                     'nama_barang' => $namaBarang,
@@ -53,7 +71,7 @@ if (is_numeric($row[7])) {
                     'divisi'      => $divisi,
                 ]);
             } else {
-                // Update stok barang
+                // Update stok
                 if ($jenis === 'in') {
                     $barang->stok += $jumlah;
                 } else {
@@ -65,6 +83,7 @@ if (is_numeric($row[7])) {
             // Simpan histori transaksi
             HistoriTransaksi::create([
                 'barang_id'   => $barang->id,
+                'user_id'     => Auth::id(), // Mengambil ID user login
                 'jenis'       => $jenis,
                 'jumlah'      => $jumlah,
                 'oleh'        => $oleh,

@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-     Schema::create('histori_transaksis', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('barang_id')->constrained()->onDelete('cascade');
-        $table->enum('jenis', ['in', 'out']);
-        $table->integer('jumlah');
-        $table->string('oleh');
-        $table->string('divisi')->nullable();
-        $table->string('keterangan')->nullable();
-        $table->timestamps();
-    });
+        Schema::create('histori_transaksis', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('barang_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // ← Tambahkan ini
+            $table->enum('jenis', ['in', 'out']);
+            $table->integer('jumlah');
+            $table->string('oleh');
+            $table->string('divisi')->nullable();
+            $table->string('keterangan')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**

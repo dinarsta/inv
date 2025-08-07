@@ -43,10 +43,10 @@
           <input type="number" name="jumlah" class="form-control" required min="1" />
         </div>
 
-        <div class="mb-3">
-          <label for="oleh" class="form-label">Dikeluarkan Oleh</label>
-          <input type="text" name="oleh" class="form-control" required />
-        </div>
+       <div class="mb-3">
+  <label for="oleh" class="form-label">Dikeluarkan Oleh</label>
+  <input type="text" name="oleh" class="form-control" required value="{{ $user->name }}" readonly />
+</div>
 
         <div class="mb-3">
           <label for="divisi" class="form-label">Divisi</label>
