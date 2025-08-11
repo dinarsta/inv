@@ -17,45 +17,43 @@ class HistoriImport implements ToCollection
         // Lewati baris pertama (header)
         $rows->shift();
 
-        foreach ($rows as $index => $row) {
-            // Cek jumlah kolom minimal
+        foreach ($rows as $row) {
+            // Pastikan ada minimal kolom yang dibutuhkan
             if (count($row) < 8) {
                 continue;
             }
 
-            $kodeQr     = (string) ($row[0] ?? null);
-            $namaBarang = $row[1] ?? null;
-            $jenisRaw   = strtolower(trim($row[2] ?? ''));
-            $jumlah     = (int) ($row[3] ?? 0);
-            $oleh       = $row[4] ?? null;
-            $divisi     = $row[5] ?? null;
-            $keterangan = $row[6] ?? null;
+            $kodeQr     = trim((string)($row[0] ?? ''));
+            $namaBarang = trim((string)($row[1] ?? ''));
+            $jenisRaw   = strtolower(trim((string)($row[2] ?? '')));
+            $jumlah     = is_numeric($row[3]) ? (int)$row[3] : 0;
+            $oleh       = trim((string)($row[4] ?? ''));
+            $divisi     = trim((string)($row[5] ?? ''));
+            $keterangan = trim((string)($row[6] ?? ''));
             $waktuRaw   = $row[7] ?? null;
 
-            // Validasi jenis transaksi
+            // Validasi jenis transaksi dengan fleksibilitas
             if (in_array($jenisRaw, ['masuk', 'in'])) {
                 $jenis = 'in';
             } elseif (in_array($jenisRaw, ['keluar', 'out'])) {
                 $jenis = 'out';
             } else {
-                continue; // jenis tidak valid
+                continue; // jenis tidak dikenali
             }
 
-            // Skip jika data penting kosong
-            if (!$kodeQr || !$namaBarang || !$oleh || !$jumlah) {
+            // Jika QR atau nama barang kosong → skip
+            if (!$kodeQr || !$namaBarang) {
                 continue;
             }
 
-            // Ubah format tanggal dari Excel
-            $waktu = null;
+            // Ubah format tanggal lebih fleksibel
             if (is_numeric($waktuRaw)) {
-                // Format Excel serial number
                 $waktu = Carbon::instance(Date::excelToDateTimeObject($waktuRaw));
             } else {
                 try {
                     $waktu = Carbon::parse($waktuRaw);
                 } catch (\Exception $e) {
-                    continue; // Format tanggal salah
+                    $waktu = now(); // fallback jika format tanggal tidak valid
                 }
             }
 
@@ -63,7 +61,7 @@ class HistoriImport implements ToCollection
             $barang = Barang::where('kode_qr', $kodeQr)->first();
 
             if (!$barang) {
-                // Buat barang baru jika belum ada
+                // Buat barang baru
                 $barang = Barang::create([
                     'kode_qr'     => $kodeQr,
                     'nama_barang' => $namaBarang,
@@ -83,10 +81,10 @@ class HistoriImport implements ToCollection
             // Simpan histori transaksi
             HistoriTransaksi::create([
                 'barang_id'   => $barang->id,
-                'user_id'     => Auth::id(), // Mengambil ID user login
+                'user_id'     => Auth::id(),
                 'jenis'       => $jenis,
                 'jumlah'      => $jumlah,
-                'oleh'        => $oleh,
+                'oleh'        => $oleh ?: '-',
                 'divisi'      => $divisi,
                 'keterangan'  => $keterangan,
                 'created_at'  => $waktu,

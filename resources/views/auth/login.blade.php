@@ -94,6 +94,14 @@
 
         <h4 class="login-title mb-4"><i class="fas fa-sign-in-alt me-2 text-primary"></i>Masuk ke Akun Anda</h4>
 
+        {{-- ✅ Tampilkan alert jika sudah ada 2 user login --}}
+        @if (session('error'))
+            <div class="alert alert-danger text-center">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        {{-- Tampilkan error validasi lainnya --}}
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
@@ -126,15 +134,10 @@
 
             <!-- Submit -->
             <button type="submit" class="btn btn-primary w-100">Masuk</button>
-
-            <!-- Register Link -->
-            <div class="form-footer">
-                Belum punya akun?
-                <a href="{{ url('/register') }}">Daftar di sini</a>
-            </div>
         </form>
     </div>
 </div>
+
 
 <!-- Toggle Password Script -->
 <script>

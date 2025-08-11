@@ -16,27 +16,38 @@ class AuthController extends Controller
         return view('auth.login'); // Buat file resources/views/auth/login.blade.php
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
+ public function login(Request $request)
+{
+    $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+    // Hitung jumlah user aktif (login terakhir belum ada logout)
+    $loggedInUsers = ActivityLog::whereNull('logout_at')
+        ->distinct('user_id')
+        ->count('user_id');
 
-            // Simpan log login
-            ActivityLog::create([
-                'user_id' => Auth::id(),
-                'login_at' => Carbon::now(),
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'keterangan' => 'Login berhasil',
-            ]);
+    if ($loggedInUsers >= 2) {
+     return back()->with('error', 'Maaf, login tidak dapat diproses karena saat ini sudah terdapat 2 pengguna yang sedang aktif.');
 
-            return redirect()->intended('/');
-        }
-
-        return back()->withErrors(['email' => 'Email atau password salah']);
     }
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        // Simpan log login
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'login_at' => Carbon::now(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'keterangan' => 'Login berhasil',
+        ]);
+
+        return redirect()->intended('/');
+    }
+
+    return back()->with('error', '❌ Email atau password salah.');
+}
+
 
 public function logout(Request $request)
 {
